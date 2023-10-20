@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Top Tracks</title>
+    <!-- <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/home.css"> -->
+    <link rel="stylesheet" href="/css/h.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+
+</head>
+<body>
+    <!-- <header>
+        <div class="logo">
+            <img src="votre_logo.png" alt="Logo">
+        </div>
+        <div class="user">
+            <div class="dropdown">
+                <button class="dropbtn"><%= displayName %></button>
+                <div class="dropdown-content">
+                    <a href="#">Profil</a>
+                    <a href="#">Déconnexion</a>
+                </div>
+            </div>
+        </div>
+    </header> -->
+
+    <header class="header" id="header">
+        <nav class="navbar container">
+            <a href="./index.html" class="brand">LyricS <%= displayName %></a>
+            <div class="menu" id="menu">
+                <ul class="menu-list">
+                    <li class="menu-item">
+                        <a href="#" class="menu-link is-active">
+                            <i class="menu-icon ion-md-home"></i>
+                            <span class="menu-name"><i class="material-icons">portrait</i></span>
+                        </a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="#" class="menu-link">
+                            <i class="menu-icon ion-md-search"></i>
+                            <span class="menu-name"><i class="material-icons">search</i></span>
+                        </a>
+                    </li>
+                    <!-- <li class="menu-item">
+                        <a href="#" class="menu-link">
+                            <i class="menu-icon ion-md-cart"></i>
+                            <span class="menu-name">Cart</span>
+                        </a>
+                    </li> -->
+                    <li class="menu-item">
+                        <a href="#" class="menu-link">
+                            <i class="menu-icon ion-md-heart"></i>
+                            <span class="menu-name">Favorite</span>
+                        </a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="#" class="menu-link">
+                            <i class="menu-icon ion-md-contact"></i>
+                            <span class="menu-name">Account</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <div>
+            <button onclick="displayvisiblesection('shortt')">4 Semaines</button>
+            <button onclick="displayvisiblesection('midt')">6 Mois</button>
+            <button onclick="displayvisiblesection('longt')">All Time</button>
+        </div>
+        
+        <section id="shortt">
+            <h1>Top 10 des titres les plus écoutés (shortterm)</h1>
+    
+        <div class="tracks-container">
+        
+            <% recentTopTracks.forEach(track => { %>
+                <div class="track">
+                    <div class="track-image">
+                    <img src="<%= track.album.images[0].url %>" alt="<%= track.name %>">
+                    </div>
+                    <div class="track-info">
+                        <a href="/track/<%= track.id %>"><h2><%= track.name %></h2></a>
+                        <% if (track.artists.length > 1) { %>
+                            <% track.artists.forEach((artist, index) => { %>
+                                <% if (index === 1) { %>
+                                    ft. <%= artist.name %>
+                                <% } else if (index === 2) { %>
+                                    , <%= artist.name %>
+                                <% } else if (index === 0) { %>
+                                    <p><%= artist.name %>
+                                <% } %>
+                            <% }); %>
+                            - <%= track.album.name %></p>
+                        <% } else { %>
+                            <p><%= track.artists[0].name %> - <%= track.album.name %></p>
+                        <% } %>
+                    </div>
+                    <div class="track-duration">
+                        <% 
+                        const durationMs = track.duration_ms;
+                        const durationSeconds = Math.floor(durationMs / 1000);
+                        const minutes = Math.floor(durationSeconds / 60);
+                        const seconds = durationSeconds % 60;
+                        %>
+                        <%= `${minutes}:${seconds.toString().padStart(2, '0')}` %> <!-- Format MM:SS -->
+                    </div>
+                </div>     
+            <% }); %>
+        </div>
+
+        </section>
+
+
+        <section id="midt" class="section-visible">
+       <h1>Top 10 des titres les plus écoutés (midterm)</h1>
+    
+        <div class="tracks-container">
+        
+            <% MidTermTopTracks.forEach(track => { %>
+                <div class="track">
+                    <div class="track-image">
+                    <img src="<%= track.album.images[0].url %>" alt="<%= track.name %>">
+                    </div>
+                    <div class="track-info">
+                        <a href="/track/<%= track.id %>"><h2><%= track.name %></h2></a>
+                        <% if (track.artists.length > 1) { %>
+                            <% track.artists.forEach((artist, index) => { %>
+                                <% if (index === 1) { %>
+                                    ft. <%= artist.name %>
+                                <% } else if (index === 2) { %>
+                                    , <%= artist.name %>
+                                <% } else if (index === 0) { %>
+                                    <p><%= artist.name %>
+                                <% } %>
+                            <% }); %>
+                            - <%= track.album.name %></p>
+                        <% } else { %>
+                            <p><%= track.artists[0].name %> - <%= track.album.name %></p>
+                        <% } %>
+                    </div>
+                    <div class="track-duration">
+                        <% 
+                        const durationMs = track.duration_ms;
+                        const durationSeconds = Math.floor(durationMs / 1000);
+                        const minutes = Math.floor(durationSeconds / 60);
+                        const seconds = durationSeconds % 60;
+                        %>
+                        <%= `${minutes}:${seconds.toString().padStart(2, '0')}` %> <!-- Format MM:SS -->
+                    </div>
+                </div>     
+            <% }); %>
+        </div>
+        </section>
+
+        <section id="longt" class="section-visible">
+            
+            <h1>Top 10 des titres les plus écoutés (longterm)</h1>
+    
+        <div class="tracks-container">
+        
+            <% longTermTopTracks.forEach(track => { %>
+                <div class="track">
+                    <div class="track-image">
+                    <img src="<%= track.album.images[0].url %>" alt="<%= track.name %>">
+                    </div>
+                    <div class="track-info">
+                        <a href="/track/<%= track.id %>"><h2><%= track.name %></h2></a>
+                        <% if (track.artists.length > 1) { %>
+                            <% track.artists.forEach((artist, index) => { %>
+                                <% if (index === 1) { %>
+                                    ft. <%= artist.name %>
+                                <% } else if (index === 2) { %>
+                                    , <%= artist.name %>
+                                <% } else if (index === 0) { %>
+                                    <p><%= artist.name %>
+                                <% } %>
+                            <% }); %>
+                            - <%= track.album.name %></p>
+                        <% } else { %>
+                            <p><%= track.artists[0].name %> - <%= track.album.name %></p>
+                        <% } %>
+                    </div>
+                    <div class="track-duration">
+                        <% 
+                        const durationMs = track.duration_ms;
+                        const durationSeconds = Math.floor(durationMs / 1000);
+                        const minutes = Math.floor(durationSeconds / 60);
+                        const seconds = durationSeconds % 60;
+                        %>
+                        <%= `${minutes}:${seconds.toString().padStart(2, '0')}` %> <!-- Format MM:SS -->
+                    </div>
+                </div>     
+            <% }); %>
+        </div>
+        </section>
+
+        
+    </main>
+
+    
+    <script src="../test/h.js"></script>
+
+    <script>
+        function displayvisiblesection(id){
+
+            if(id === "shortt"){
+                document.getElementById("midt").style.display='none';
+                document.getElementById("longt").style.display='none';
+                document.getElementById(id).style.display='block';                
+            }
+
+            else if(id === "midt"){
+                document.getElementById("shortt").style.display='none';
+                document.getElementById("longt").style.display='none';
+                document.getElementById(id).style.display='block';                
+            }
+
+            else if(id === "longt"){
+                document.getElementById("shortt").style.display='none';
+                document.getElementById("midt").style.display='none';
+                document.getElementById(id).style.display='block';                
+            }
+
+        }
+    </script>
+    
+    <!-- Compiled and minified JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+
+</body>
+</html>

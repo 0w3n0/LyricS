@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Détails de la musique</title>
+</head>
+<body>
+    <h1>Détails de la musique</h1>
+    <!-- Affichez les détails de la musique ici -->
+    <p>Nom de la musique: <%= trackDatasInfos.name %></p>
+    <p>Artiste(s): 
+        <% trackDatasInfos.artists.forEach(artist => { %>
+            <%= artist.name %> 
+        <% }); %>
+    </p>
+    <p>Nom de l'album: <%= trackDatasInfos.album.name %></p>
+    <!-- Ajoutez un lien vers la musique sur Spotify -->
+    <a href="<%= trackDatasInfos.external_urls.spotify %>">Écouter sur Spotify</a>
+</body>
+</html>
