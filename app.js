@@ -138,6 +138,56 @@ app.get('/top-tracks', async (req, res) => {
 }
 );
 
+app.get('/search', async (req, res) => {
+  if (req.isAuthenticated()) {
+    const user = req.user; // Accédez aux informations de l'utilisateur à partir de req.user
+    const accessToken = user.accessToken; // Exemple : Accédez à l'accessToken de l'utilisateur
+    if (req.user && req.user.accessToken) {
+      try {
+        // const apiUrl = `https://api.spotify.com/v1/search?q=${query}&type=track,artist&limit=10&market=FR`;
+
+        // const [searchResponse] = await Promise.all([
+        //   axios.get(apiUrl, {
+        //     headers: {
+        //       'Authorization': `Bearer ${accessToken}`
+        //     }
+        //   })
+        // ]);
+
+        const displayName = user.displayName;
+        
+        axios.get('https://api.spotify.com/v1/me', {
+          headers: {
+            'Authorization': `Bearer ${accessToken}`
+          }
+        })
+          .then(response => {
+            const displayName = response.data.display_name;
+            console.log('Pseudonyme de l\'utilisateur :', displayName);
+          })
+          .catch(error => {
+            console.error('Erreur lors de la récupération du pseudonyme de l\'utilisateur :', error);
+          });
+
+        res.render('search', { displayName, accessToken });
+      } catch (error) {
+        console.error('Erreur lors de la récupération des données Spotify:', error);
+        res.status(500).send('Erreur lors de la récupération des données Spotify');
+      }
+    }
+
+    else {
+      console.log("Access Token:", req.user.accessToken, "<br/><br/><br/><br/><br/><br/><br/><br/>"); // Ajout de cette ligne
+
+      console.error("Erreur: Access Token non disponible");
+      res.status(401).send("Erreur: Accès non autorisé");
+    }
+  }
+  else {
+    res.redirect('/auth/spotify'); // Redirigez l'utilisateur vers l'authentification si ce n'est pas déjà fait
+  }
+}
+);
 
 app.get('/track/:id', async (req, res) => {
   if (req.isAuthenticated()) {

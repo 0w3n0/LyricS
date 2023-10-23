@@ -1,3 +1,4 @@
+@charset "UTF-8";
 :root {
   --color-black: hsl(0, 0%, 10%);
   --color-white: hsl(0, 0%, 100%);
@@ -268,4 +269,118 @@ h1 {
 
 .section-visible {
   display: none;
+}
+
+.button-container-timerange {
+  width: 80vw;
+  display: flex;
+  justify-content: space-evenly;
+  margin: 1vh auto;
+}
+.button-container-timerange .btn-timerange-self {
+  background-color: lightgreen;
+}
+
+.form__group {
+  position: relative;
+  padding: 15px 0 0;
+  margin: 0px 3vw 0px 3vw;
+  width: 50%;
+}
+
+.form__field {
+  font-family: inherit;
+  width: 100%;
+  border: 0;
+  border-bottom: 2px solid #9b9b9b;
+  outline: 0;
+  font-size: 1.3rem;
+  color: black;
+  padding: 7px 0;
+  background: transparent;
+  transition: border-color 0.2s;
+}
+.form__field::-moz-placeholder {
+  color: transparent;
+}
+.form__field::placeholder {
+  color: transparent;
+}
+.form__field:-moz-placeholder-shown ~ .form__label {
+  font-size: 1.3rem;
+  cursor: text;
+  top: 20px;
+}
+.form__field:placeholder-shown ~ .form__label {
+  font-size: 1.3rem;
+  cursor: text;
+  top: 20px;
+}
+
+.form__label {
+  position: absolute;
+  top: 0;
+  display: block;
+  transition: 0.2s;
+  font-size: 1rem;
+  color: #9b9b9b;
+}
+
+.form__field:focus {
+  padding-bottom: 6px;
+  font-weight: 700;
+  border-width: 3px;
+  -o-border-image: linear-gradient(to right, #11998e, #38ef7d);
+     border-image: linear-gradient(to right, #11998e, #38ef7d);
+  border-image-slice: 1;
+}
+.form__field:focus ~ .form__label {
+  position: absolute;
+  top: 0;
+  display: block;
+  transition: 0.2s;
+  font-size: 1rem;
+  color: #11998e;
+  font-weight: 700;
+}
+
+/* reset input */
+.form__field:required, .form__field:invalid {
+  box-shadow: none;
+}
+
+.artists-container {
+  overflow-x: scroll;
+  white-space: nowrap; /* Pour empêcher le saut de ligne */
+  margin: 5vh 0vw 1vh 3vw;
+}
+
+.artist {
+  display: inline-block;
+  margin-right: 20px;
+  text-align: center;
+  background: rgba(222, 245, 229, 0.5019607843);
+  width: 42vw;
+  padding: 3vh 2vw;
+  border-radius: 50px;
+  box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+}
+
+.artist-image img {
+  border-radius: 50%;
+  width: 80px;
+  min-width: 80px;
+  height: 80px;
+  min-height: 80px;
+  margin: 0 auto;
+}
+
+.artist-name {
+  margin: 10px auto 0px auto;
+  font-size: 14px;
+  font-weight: bold;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  max-width: 30vw;
 }/*# sourceMappingURL=h.css.map */
