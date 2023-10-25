@@ -381,6 +381,32 @@ $gray: #9b9b9b;
 	margin: 5vh 0vw 1vh 3vw;
 }
 
+.artists-container-home {
+	/* Pour empêcher le saut de ligne */
+	margin: 5vh 0vw 5rem 3vw;
+}
+
+.artist-home {
+	display: inline-block;
+	margin-right: 10px;
+    margin-left: 8px;
+    margin-bottom: 20px;
+	text-align: center;
+	background: #DEF5E580;
+	width: 42vw;
+	padding: 3vh 2vw;
+	border-radius: 50px;
+	box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+}
+
+.title-button-holder{
+	font-size: 14px;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-around;
+}
+
 .artist {
 	display: inline-block;
 	margin-right: 20px;
