@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Top Tracks</title>
+    <!-- <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/home.css"> -->
+    <link rel="stylesheet" href="/css/h.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+
+</head>
+
+<body>
+    <%- include('header.ejs') %>
+    <main>
+        <div class="tracks-container">
+            <% Home_infos_artists_datas.forEach(artist => { %>
+                <div class="track">
+                    <div class="track-image">
+                        <% if(artist.images.length > 0) { %>
+                            <img src="<%= artist.images[0].url %>" alt="<%= artist.name %>">
+                        <% } else { %>
+                            <img src="../images/user-defaut-pp.jpg" alt="<%= artist.name %>">
+                        <% } %>
+                    </div>
+                    <div class="track-info">
+                        <h2>
+                            <%= artist.name %>
+                        </h2>
+                    </div>
+                </div>
+            <% }); %>
+        </div>
+
+        <div class="tracks-container">
+
+            <% Home_infos_tracks_datas.forEach(track=> { %>
+                <div class="track">
+                    <div class="track-image">
+                        <% if(track.album.images[0].url){ %>
+                            <img src="<%= track.album.images[0].url %>" alt="<%= track.name %>">
+                            <% } else{ %>
+                                <img src="../images/user-defaut-pp.jpg" alt="<%= track.name %>">
+                                <% } %>
+                    </div>
+                    <div class="track-info">
+                        <a href="/track/<%= track.id %>">
+                            <h2>
+                                <%= track.name %>
+                            </h2>
+                        </a>
+                        <% if (track.artists.length> 1) { %>
+                            <% track.artists.forEach((artist, index)=> { %>
+                                <% if (index===1) { %>
+                                    ft. <%= artist.name %>
+                                        <% } else if (index===2) { %>
+                                            , <%= artist.name %>
+                                                <% } else if (index===0) { %>
+                                                    <p>
+                                                        <%= artist.name %>
+                                                            <% } %>
+                                                                <% }); %>
+                                                                    - <%= track.album.name %>
+                                                    </p>
+                                                    <% } else { %>
+                                                        <p>
+                                                            <%= track.artists[0].name %> - <%= track.album.name %>
+                                                        </p>
+                                                        <% } %>
+                    </div>
+                    <div class="track-duration">
+                        <% const durationMs=track.duration_ms; const durationSeconds=Math.floor(durationMs / 1000);
+                            const minutes=Math.floor(durationSeconds / 60); const seconds=durationSeconds % 60; %>
+                            <%= `${minutes}:${seconds.toString().padStart(2, '0' )}` %> <!-- Format MM:SS -->
+                    </div>
+                </div>
+                <% }); %>
+        </div>
+    </main>
+
+
+    <script src="../test/h.js"></script>
+
+    <!-- Compiled and minified JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+
+</body>
+
+</html>

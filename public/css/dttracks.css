@@ -45,6 +45,8 @@ body {
   font-weight: 400;
   line-height: 1.5;
   color: var(--color-black);
+  overflow-x: scroll;
+  overflow-y: hidden;
 }
 
 a,
@@ -405,30 +407,5 @@ h1 {
 }
 
 #TDetails {
-  padding: 0px 0px 5rem 0px;
-}
-
-.track-infos-datas {
-  padding: 20px;
-  background-color: #fff;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  border-radius: 10px;
-  max-width: 100%;
-  margin: 0 auto;
-}
-.track-infos-datas h2 {
-  font-size: 26px;
-  margin-bottom: 10px;
-}
-.track-infos-datas p {
-  font-size: 16px;
-  color: #888;
-  margin-bottom: 10px;
-}
-.track-infos-datas img {
-  max-width: 100%;
-  height: auto;
-  -o-object-fit: cover;
-     object-fit: cover;
-  border-radius: 8px;
-}/*# sourceMappingURL=h.css.map */
+  padding-top: 0px;
+}/*# sourceMappingURL=dttracks.css.map */

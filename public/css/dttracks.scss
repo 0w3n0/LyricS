@@ -47,7 +47,10 @@ body {
 	line-height: 1.5;
 	color: var(--color-black);
 	// background: var(--color-white);
+    overflow-x: scroll;
+	overflow-y: hidden;
 }
+
 
 a,
 button {
@@ -434,31 +437,5 @@ $gray: #9b9b9b;
 }
 
 #TDetails {
-	padding: 0px 0px 5rem 0px;
-}
-
-.track-infos-datas{
-    padding: 20px;
-    background-color: #fff;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    border-radius: 10px;
-    max-width: 100%;
-    margin: 0 auto;
-	h2 {
-		font-size: 26px;
-		margin-bottom: 10px;
-	}
-
-	p{
-		font-size: 16px;
-		color: #888;
-		margin-bottom: 10px;
-	}
-
-	img {
-		max-width: 100%;
-		height: auto;
-		object-fit: cover;
-		border-radius: 8px;
-	}
+	padding-top: 0px;
 }

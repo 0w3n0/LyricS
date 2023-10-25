@@ -1,21 +1,37 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Détails de la musique</title>
+    <link rel="stylesheet" href="/css/h.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
 </head>
+
 <body>
-    <h1>Détails de la musique</h1>
-    <!-- Affichez les détails de la musique ici -->
-    <p>Nom de la musique: <%= trackDatasInfos.name %></p>
-    <p>Artiste(s): 
-        <% trackDatasInfos.artists.forEach(artist => { %>
-            <%= artist.name %> 
-        <% }); %>
-    </p>
-    <p>Nom de l'album: <%= trackDatasInfos.album.name %></p>
-    <!-- Ajoutez un lien vers la musique sur Spotify -->
-    <a href="<%= trackDatasInfos.external_urls.spotify %>">Écouter sur Spotify</a>
+
+    <%- include('header.ejs') %>
+
+        <main id="TDetails">
+
+            <!-- <h1>Détails de la musique</h1> -->
+            <!-- Affichez les détails de la musique ici -->
+            <div class="track-image-details">
+                <img src="<%= trackDatasInfos.album.images[0].url %>" alt="<%= trackDatasInfos.name %>">
+            </div>
+            
+            <div class="track-infos-datas">
+                <h2><%= trackDatasInfos.name %></h2>
+                <p>Auteur(s): <% trackDatasInfos.artists.forEach(artist=> { %> <%= artist.name %> <% }); %></p>
+                <img src="<%= trackDatasInfos.album.images[0].url %>" alt="<%= trackDatasInfos.name %>">
+                <!-- Ajoutez d'autres statistiques ici -->
+            </div>
+
+            <!-- Ajoutez un lien vers la musique sur Spotify -->
+            <a href="<%= trackDatasInfos.external_urls.spotify %>">Écouter sur Spotify</a>
+        </main>
 </body>
+
 </html>
