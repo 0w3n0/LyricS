@@ -197,8 +197,13 @@ app.get('/track/:id', async (req, res) => {
 
     if (req.user && req.user.accessToken) {
       try {
-        const [trackDatas] = await Promise.all([
+        const [trackDatas, recommendationsResponse] = await Promise.all([
           axios.get(`https://api.spotify.com/v1/tracks/${trackId}`, {
+            headers: {
+              'Authorization': `Bearer ${req.user.accessToken}`
+            }
+          }),
+          axios.get(`https://api.spotify.com/v1/recommendations?seed_tracks=${trackId}`, {
             headers: {
               'Authorization': `Bearer ${req.user.accessToken}`
             }
@@ -207,6 +212,7 @@ app.get('/track/:id', async (req, res) => {
 
         const trackDatasInfos = trackDatas.data;
         const displayName = user.displayName;
+        const recommendedTracks = recommendationsResponse.data.tracks;
 
         axios.get('https://api.spotify.com/v1/me', {
           headers: {
@@ -221,7 +227,7 @@ app.get('/track/:id', async (req, res) => {
             console.error('Erreur lors de la récupération du pseudonyme de l\'utilisateur :', error);
           });
 
-        res.render('trackDetails', { trackDatasInfos, displayName });
+        res.render('trackDetails', { trackDatasInfos, recommendedTracks, displayName });
       } catch (error) {
         console.error('Erreur lors de la récupération des données Spotify:', error);
         res.status(500).send('Erreur lors de la récupération des données Spotify');
@@ -298,6 +304,51 @@ app.get('/home', async (req, res) => {
 }
 );
 
+app.get('/artist/:id', async (req, res) => {
+  if (req.isAuthenticated()) {
+    const user = req.user;
+    const accessToken = user.accessToken;
+    const artistId = req.params.id;
+
+    if (req.user && req.user.accessToken) {
+      try {
+        const [ArtistInfosResponse, ArtistrecommendationsResponse, ArtistTopTracksResponse] = await Promise.all([
+          axios.get(`https://api.spotify.com/v1/artists/${artistId}`, {
+            headers: {
+              'Authorization': `Bearer ${req.user.accessToken}`
+            }
+          }),
+          axios.get(`https://api.spotify.com/v1/artists/${artistId}/related-artists`, {
+            headers: {
+              'Authorization': `Bearer ${accessToken}`
+            }
+          }),
+          axios.get(`https://api.spotify.com/v1/artists/${artistId}/top-tracks?market=FR`, {
+            headers: {
+              'Authorization': `Bearer ${accessToken}`
+            }
+          })
+        ]);
+
+        const ArtistInfos = ArtistInfosResponse.data;
+        const TopTracks = ArtistTopTracksResponse.data;
+        const recommendationArtists = ArtistrecommendationsResponse.data;
+        const displayName = user.displayName;
+        console.log(TopTracks);
+        
+        res.render('artistDetails', { ArtistInfos, recommendationArtists, TopTracks, displayName });
+      } catch (error) {
+        console.error('Erreur lors de la récupération des top tracks de l\'artiste:', error);
+        res.status(500).send('Erreur lors de la récupération des top tracks de l\'artiste');
+      }
+    } else {
+      console.error("Erreur: Access Token non disponible");
+      res.status(401).send("Erreur: Accès non autorisé");
+    }
+  } else {
+    res.redirect('/'); // Redirigez l'utilisateur vers l'authentification si ce n'est pas déjà fait
+  }
+});
 
 
 

@@ -43,7 +43,10 @@
                     <% }); %>
             </div>
 
-            <h2>Dernières musiques favorites</h2>
+            <div class="title-button-holder">
+                <h2>Dernières musiques favorites</h2>
+                <button><a href="/top-tracks">VOIR PLUS</a></button>
+            </div>
 
             <div class="artists-container-home">
 
@@ -56,12 +59,30 @@
                                     <img src="../images/user-defaut-pp.jpg" alt="<%= track.name %>">
                                     <% } %>
                         </div>
-                        <div>
+                        <div id="home-track-infos">
                             <a href="/track/<%= track.id %>">
                                 <h2 class="artist-name">
                                     <%= track.name %>
                                 </h2>
                             </a>
+                            <% if (track.artists.length> 1) { %>
+                                <% track.artists.forEach((artist, index)=> { %>
+                                    <% if (index===1) { %>
+                                        ft. <%= artist.name %>
+                                            <% } else if (index===2) { %>
+                                                , <%= artist.name %>
+                                                    <% } else if (index===0) { %>
+                                                        <p>
+                                                            <%= artist.name %>
+                                                                <% } %>
+                                                                    <% }); %>
+                                                                        - <%= track.album.name %>
+                                                        </p>
+                                                        <% } else { %>
+                                                            <p>
+                                                                <%= track.artists[0].name %> - <%= track.album.name %>
+                                                            </p>
+                                                            <% } %>
                         </div>
                     </div>
                     <% }); %>

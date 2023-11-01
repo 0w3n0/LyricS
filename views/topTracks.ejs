@@ -19,10 +19,6 @@
 
         <section id="shortt">
             <h1>Top 10 des titres les plus écoutés (shortterm)</h1>
-            <div class="button-container-timerange">
-                <button class="btn-timerange-self" onclick="displayvisiblesection('shortt')">Artistes</button>
-                <button class="btn-timerange-self" onclick="displayvisiblesection('midt')">Chansons</button>
-            </div>
 
             <div class="button-container-timerange">
                 <button class="btn-timerange-self" onclick="displayvisiblesection('shortt')">4 Semaines</button>
@@ -45,19 +41,19 @@
                             <% if (track.artists.length> 1) { %>
                                 <% track.artists.forEach((artist, index)=> { %>
                                     <% if (index===1) { %>
-                                        ft. <%= artist.name %>
+                                        ft. <a href="/artist/<%= artist.id %>"><%= artist.name %></a>
                                             <% } else if (index===2) { %>
-                                                , <%= artist.name %>
+                                                , <a href="/artist/<%= artist.id %>"><%= artist.name %></a>
                                                     <% } else if (index===0) { %>
                                                         <p>
-                                                            <%= artist.name %>
+                                                            <a href="/artist/<%= artist.id %>"><%= artist.name %></a>
                                                                 <% } %>
                                                                     <% }); %>
                                                                         - <%= track.album.name %>
                                                         </p>
                                                         <% } else { %>
                                                             <p>
-                                                                <%= track.artists[0].name %> - <%= track.album.name %>
+                                                                <a href="/artist/<%= track.artists[0].id %>"><%= track.artists[0].name %></a> - <%= track.album.name %>
                                                             </p>
                                                             <% } %>
                         </div>

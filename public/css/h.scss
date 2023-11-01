@@ -389,8 +389,8 @@ $gray: #9b9b9b;
 .artist-home {
 	display: inline-block;
 	margin-right: 10px;
-    margin-left: 8px;
-    margin-bottom: 20px;
+	margin-left: 8px;
+	margin-bottom: 20px;
 	text-align: center;
 	background: #DEF5E580;
 	width: 42vw;
@@ -399,12 +399,16 @@ $gray: #9b9b9b;
 	box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
 }
 
-.title-button-holder{
-	font-size: 14px;
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: space-around;
+.title-button-holder {
+	font-size: 12px;
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+	justify-content: space-around;
+
+	button{
+		font-size: 15px;
+	}
 }
 
 .artist {
@@ -427,6 +431,16 @@ $gray: #9b9b9b;
 	margin: 0 auto;
 }
 
+#home-track-infos p{
+	margin: 0 auto;
+    max-width: 30vw;
+    font-size: 14px;
+    color: #888;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
 .artist-name {
 	margin: 10px auto 0px auto;
 	font-size: 14px;
@@ -437,45 +451,68 @@ $gray: #9b9b9b;
 	max-width: 30vw;
 }
 
-.track-image-details img {
-	border-radius: 50%;
-	width: 200px;
-	min-width: 200px;
-	height: 200px;
-	min-height: 200px;
-	margin: 0 auto;
-}
 
 .track-image-details {
 	height: 100vh;
 	width: 100vw;
-	 /* Active le défilement horizontal */
 	background: lightblue;
 	display: flex;
-    align-items: center;
-	// -webkit-filter: blur(5px);
-	// /* Safari 6.0 - 9.0 */
-	// filter: blur(10px);
-	// z-index: -1;
+	align-items: center;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	gap: 10px;
+
+	p {
+		color:  whitesmoke;
+		z-index: 1;
+		font-size: 1rem;
+	}
+
+	h2{
+		color: whitesmoke;
+		z-index: 1;
+		font-size: 1.25rem;
+	}
+
+	h4{
+		color: whitesmoke;
+		text-transform:uppercase;
+		z-index: 1;
+		font-size: 0.75rem;
+	}
+
+	img {
+		border-radius: 50%;
+		width: 200px;
+		min-width: 200px;
+		height: 200px;
+		min-height: 200px;
+		margin: 0 auto;
+		z-index: 1;
+	}
 }
+
+
 
 #TDetails {
 	padding: 0px 0px 5rem 0px;
 }
 
-.track-infos-datas{
-    padding: 20px;
-    background-color: #fff;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    border-radius: 10px;
-    max-width: 100%;
-    margin: 0 auto;
+.track-infos-datas {
+	padding: 20px;
+	background-color: #fff;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+	border-radius: 10px;
+	max-width: 100%;
+	margin: 0 auto;
+
 	h2 {
 		font-size: 26px;
 		margin-bottom: 10px;
 	}
 
-	p{
+	p {
 		font-size: 16px;
 		color: #888;
 		margin-bottom: 10px;
