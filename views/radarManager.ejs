@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Top Tracks</title>
+    <!-- <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/home.css"> -->
+    <link rel="stylesheet" href="/css/h.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+
+</head>
+
+<body>
+    <%- include('header.ejs') %>
+
+    <main>
+
+    <div class="tracks-container">
+        
+    <h2>Albums récents des artistes que vous suivez :</h2>
+    
+    <% const albumTypes = { 'album': 'Albums', 'single': 'Singles', 'compilation': 'Compilations', 'appears_on': 'Apparitions' }; %>
+
+<% albumsByArtist.forEach(artist => { %>
+    
+            <% if (artist && artist.length > 0) { %>
+        <!-- <h3><%= artist[0].artists[0].name %></h3> -->
+        <!-- <ul> -->
+            <% Object.keys(albumTypes).forEach(type => { %>
+                <% const albumsOfType = artist.filter(album => album.album_type === type); %>
+                <% if (albumsOfType.length > 0) { %>
+                   <strong><%= albumTypes[type] %>:</strong>
+                    <% albumsOfType.forEach(album => { %>
+                        <div class="track">
+                            <div class="track-image">
+                            <img src="<%= album.images[0].url %>" alt="<%= album.name %>">
+                            </div>
+                        <div class="track-info">
+                            <%= album.name %> - <%= album.release_date %>
+                            <% if (type === 'album') { %>
+                                <ul>
+                                    <% album.tracks.forEach(track => { %>
+                                        <li><%= track.name %></li>
+                                    <% }); %>
+                                </ul>
+                            <% } %>
+                            <% if (type === 'single') { %>
+                                <% if (album.total_tracks > 1) { %>
+                                <ul>
+                                    <% album.tracks.forEach(track => { %>
+                                        <li><%= track.name %></li>
+                                    <% }); %>
+                                </ul>
+                                <% } else {%>
+                                    
+                                <% } %>
+                            <% } %>
+                        </div>
+                    </div>
+                    <% }); %>
+                <% } %>
+            <% }); %>
+        <!-- </ul> -->
+    <% } %>
+<% }); %>
+</div>
+</main>
+
+        <script src="../test/h.js"></script>
+
+        <!-- Compiled and minified JavaScript -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+
+</body>
+
+</html>
