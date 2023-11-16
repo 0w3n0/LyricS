@@ -11,8 +11,10 @@ app.set('view engine', 'ejs');
 app.use(express.static('public'));
 
 // Configurations de l'API Spotify
-const clientId = 'd2dd99251bd9480b81222d8e8b26f6dd';
-const clientSecret = 'c6948141c6814b08826dc09eda752ef3';
+const clientId = 'd2dd99251bd9480b81222d8e8b26f6dd'; // LyricS
+// const clientId = '862c7dacc1604e9db43fc7bcf899ca4c'; // LyricS BP
+const clientSecret = 'c6948141c6814b08826dc09eda752ef3';  // LyricS
+// const clientSecret = 'cb373d236ee74396aedddcfbabdd9d9e';  // LyricS BP
 const redirectUri = 'http://localhost:3000/auth/spotify/callback';
 
 app.get('/', (req, res) => {
@@ -188,97 +190,6 @@ app.get('/search', async (req, res) => {
   }
 }
 );
-
-// app.get('/radar', async (req, res) => {
-//   if (req.isAuthenticated()) {
-//     const user = req.user; // Accédez aux informations de l'utilisateur à partir de req.user
-//     const accessToken = user.accessToken; // Exemple : Accédez à l'accessToken de l'utilisateur
-
-//     if (req.user && req.user.accessToken) {
-//       try {
-//         const [artistSub, allNewReleasesRequest] = await Promise.all([
-//           axios.get('https://api.spotify.com/v1/me/following?type=artist&limit=50', {
-//             headers: {
-//               'Authorization': `Bearer ${req.user.accessToken}`
-//             }
-//           })
-//         ]);
-
-//         const limit = 20; // Nombre de résultats par page
-//         let offset = 0;
-//         let allNewReleases = [];
-//         let maxOffset = 1000;
-
-//         // Utilisez une boucle pour paginer à travers les résultats
-//         while (offset < 1000) {
-//           const newReleasesRequest = await axios.get('https://api.spotify.com/v1/browse/new-releases', {
-//             headers: {
-//               'Authorization': `Bearer ${req.user.accessToken}`
-//             },
-//             params: {
-//               country: 'FR',
-//               limit: limit,
-//               offset: offset
-//             }
-//           });
-
-//           const releases = newReleasesRequest.data.albums.items;
-
-//           if (releases.length === 0) {
-//             console.log("finito");
-//             // Aucune nouvelle sortie trouvée, sortez de la boucle
-//             break;
-//           }
-
-//           // Ajoutez les nouvelles sorties de la page actuelle à la liste globale
-//           allNewReleases = allNewReleases.concat(releases);
-
-//           // Incrémentez l'offset pour obtenir la page suivante
-//           offset += limit;
-//           console.log(offset);
-//         }
-
-//         const randomArtistId = '4Nrd0CtP8txoQhnnlRA6V6';
-
-//         const artists = artistSub.data.artists.items;
-//         // Filtrer les nouvelles sorties par l'artiste spécifique
-//         // const newReleasesId = allNewReleasesRequest.data.albums.items.filter(release => release.artists.some(artist => artist.id === randomArtistId));
-//         const newReleasesId = 0;
-//         const displayName = user.displayName;
-
-//         axios.get('https://api.spotify.com/v1/me', {
-//           headers: {
-//             'Authorization': `Bearer ${accessToken}`
-//           }
-//         })
-//           .then(response => {
-//             const displayName = response.data.display_name;
-//             console.log('Pseudonyme de l\'utilisateur :', displayName);
-//           })
-//           .catch(error => {
-//             console.error('Erreur lors de la récupération du pseudonyme de l\'utilisateur :', error);
-//           });
-
-//         res.render('radarManager', { artists, newReleases: allNewReleases, newReleasesId, displayName });
-//       } catch (error) {
-//         console.error('Erreur lors de la récupération des données Spotify:', error);
-//         res.status(500).send('Erreur lors de la récupération des données Spotify');
-//       }
-//     }
-
-//     else {
-//       console.log("Access Token:", req.user.accessToken, "<br/><br/><br/><br/><br/><br/><br/><br/>"); // Ajout de cette ligne
-
-//       console.error("Erreur: Access Token non disponible");
-//       res.status(401).send("Erreur: Accès non autorisé");
-//     }
-//   }
-//   else {
-//     res.redirect('/'); // Redirigez l'utilisateur vers l'authentification si ce n'est pas déjà fait
-//   }
-// });
-
-
 // truc où les artistes sont 2 fois dedans et
 app.get('/radar', async (req, res) => {
   if (req.isAuthenticated()) {
@@ -287,8 +198,29 @@ app.get('/radar', async (req, res) => {
 
     if (req.user && req.user.accessToken) {
       try {
-        const startDate = new Date('2023-10-27');
-        const endDate = new Date('2023-11-10');
+        // Récupérer la date d'aujourd'hui
+        const currentDate = new Date();
+
+        // Définir l'heure, les minutes, les secondes et les millisecondes à 0
+        currentDate.setHours(0, 0, 0, 0);
+
+        // Récupérer le jour de la semaine (0 pour dimanche, 1 pour lundi, ..., 6 pour samedi)
+        const currentDay = currentDate.getDay();
+
+        // Si aujourd'hui est vendredi (jour de la semaine = 5), ajuster la date de fin et de début
+        let startDate = new Date(currentDate);
+        let endDate = new Date(currentDate);
+
+        if (currentDay === 5) {
+          // Si aujourd'hui est vendredi, ajuster la date de fin à aujourd'hui et la date de début à il y a 7 jours
+          startDate.setDate(startDate.getDate() - 8);
+        } else {
+          // Sinon, ajuster la date de fin au prochain vendredi et la date de début à vendredi - 7 jours
+          endDate.setDate(endDate.getDate() + ((5 - currentDay + 7) % 7) - 6);
+          startDate.setDate(startDate.getDate() + ((5 - currentDay + 7) % 7) - 15);
+        }
+
+        console.log(`ça commence à ${startDate} et termine à ${endDate}`);
 
         const allFollowedArtists = await getAllFollowedArtists(accessToken);
 
@@ -362,7 +294,7 @@ const getRecentAlbumsForArtist = async (accessToken, artistId, startDate, endDat
         'Authorization': `Bearer ${accessToken}`
       },
       params: {
-        include_groups: 'album,single,compilation,appears_on',
+        include_groups: 'album,single,appears_on',
         limit: 50
       }
     });
@@ -437,8 +369,24 @@ app.get('/track/:id', async (req, res) => {
 
         res.render('trackDetails', { trackDatasInfos, recommendedTracks, displayName });
       } catch (error) {
-        console.error('Erreur lors de la récupération des données Spotify:', error);
-        res.status(500).send('Erreur lors de la récupération des données Spotify');
+        if (error.response && error.response.status === 429) {
+          // L'erreur est due à trop de requêtes, vérifions s'il y a un délai recommandé
+          const retryAfter = error.response.headers['retry-after'];
+
+          if (retryAfter) {
+            // Attendre le temps recommandé avant de réessayer
+            console.log(`Trop de requêtes. Attendez ${retryAfter} secondes.`);
+            await new Promise(resolve => setTimeout(resolve, retryAfter * 1000));
+
+            // Réessayer la requête
+            // ...
+          }
+        } else {
+          // Gérer d'autres types d'erreurs
+          console.error('Erreur lors de la récupération des données Spotify:', error);
+          res.status(500).send('Erreur lors de la récupération des données Spotify');
+        }
+
       }
     }
 

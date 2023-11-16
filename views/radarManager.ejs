@@ -16,60 +16,255 @@
 <body>
     <%- include('header.ejs') %>
 
-    <main>
+        <main>
 
-    <div class="tracks-container">
-        
-    <h2>Albums récents des artistes que vous suivez :</h2>
-    
-    <% const albumTypes = { 'album': 'Albums', 'single': 'Singles', 'compilation': 'Compilations', 'appears_on': 'Apparitions' }; %>
+            <div class="tracks-container">
 
-<% albumsByArtist.forEach(artist => { %>
-    
-            <% if (artist && artist.length > 0) { %>
-        <!-- <h3><%= artist[0].artists[0].name %></h3> -->
-        <!-- <ul> -->
-            <% Object.keys(albumTypes).forEach(type => { %>
-                <% const albumsOfType = artist.filter(album => album.album_type === type); %>
-                <% if (albumsOfType.length > 0) { %>
-                   <strong><%= albumTypes[type] %>:</strong>
-                    <% albumsOfType.forEach(album => { %>
-                        <div class="track">
-                            <div class="track-image">
-                            <img src="<%= album.images[0].url %>" alt="<%= album.name %>">
-                            </div>
-                        <div class="track-info">
-                            <%= album.name %> - <%= album.release_date %>
-                            <% if (type === 'album') { %>
-                                <ul>
-                                    <% album.tracks.forEach(track => { %>
-                                        <li><%= track.name %></li>
-                                    <% }); %>
-                                </ul>
-                            <% } %>
-                            <% if (type === 'single') { %>
-                                <% if (album.total_tracks > 1) { %>
-                                <ul>
-                                    <% album.tracks.forEach(track => { %>
-                                        <li><%= track.name %></li>
-                                    <% }); %>
-                                </ul>
-                                <% } else {%>
-                                    
-                                <% } %>
-                            <% } %>
-                        </div>
+                <h2>Albums récents des artistes que vous suivez :</h2>
+
+                <div id="btn-switch-holder">
+                    <div class="cbDiv">
+                        <input type="checkbox" id="singlecontainerCheckbox" checked>
+                        <label class="checkbox-container" for="singleCheckbox" id="singleCheckboxContainer">Singles</label>
                     </div>
+                    
+                    <div class="cbDiv">
+                        <input type="checkbox" id="albumcontainerCheckbox" checked>
+                        <label class="checkbox-container" for="albumCheckbox" id="albumCheckboxContainer">Albums</label>
+                    </div>
+                    
+                    <div class="cbDiv">
+                        <input type="checkbox" id="epcontainerCheckbox" checked>
+                        <label class="checkbox-container" for="epCheckbox" id="epCheckboxContainer">EPs</label>
+                    </div>
+                </div>
+
+                <% const albumTypes={ 'album' : 'Albums' , 'single' : 'Singles' , 'compilation' : 'Compilations' , 'appears_on' : 'Apparitions' }; %>
+                    
+                <div id="albumcontainer" class="album-container animate__animated animate__fadeIn">
+                    <h2>Albums</h2>
+                    <% albumsByArtist.forEach(artist => { %>
+                        <% if (artist && artist.length > 0) { %>
+                            <% const albumsOfType = artist.filter(album => album.album_type === 'album'); %>
+                            <% if (albumsOfType.length > 0) { %>
+                                <% albumsOfType.forEach(album => { %>
+                                    <div class="album-preset">
+                                        <div class="album-preset-image">
+                                            <img src="<%= album.images[0].url %>" alt="<%= album.name %>">
+                                        </div>
+                                        <div class="album-preset-info">
+                                            <h2><%= album.name %></h2> 
+                                            <h3><a href="/artist/<%= album.artists[0].id %>"><%= album.artists[0].name %></a></h3> 
+                                            <h4><%= album.release_date %></h4>
+                                            <div class="tracks-section">
+        
+                                                <!-- Affichez les cinq premières pistes -->
+                                                <ul class="track-list">
+                                                    <% album.tracks.slice(0, 5).forEach(track=> { %>
+                                                        <li>
+                                                            <a href="/track/<%= track.id %>"><%= track.name %></a>
+                                                        </li>
+                                                    <% }); %>
+                                                </ul>
+        
+                                                <!-- Affichez le reste des pistes dans la div cachée -->
+                                                <div class="hidden-tracks">
+                                                    <ul>
+                                                        <% album.tracks.slice(5).forEach(track=> { %>
+                                                            <li>
+                                                                <a href="/track/<%= track.id %>"><%= track.name %></a>
+                                                            </li>
+                                                        <% }); %>
+                                                    </ul>
+                                                </div>
+        
+                                                <!-- Ajoutez un bouton "Afficher plus" -->
+                                                <div class="btn-center-div">
+                                                    <button class="show-more-button" onclick="toggleTracks(this)">
+                                                        <div class="button-content">
+                                                            <span>Afficher plus</span>
+                                                            <i class="material-icons" id="arrow-icon">keyboard_arrow_down</i>
+                                                        </div>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                <% }); %>
+                            <% } %>
+                        <% } %>
                     <% }); %>
-                <% } %>
-            <% }); %>
-        <!-- </ul> -->
-    <% } %>
-<% }); %>
-</div>
-</main>
+                </div>
+                
+                <div id="singlecontainer" class="single-container animate__animated animate__fadeIn">
+                    <h2>Singles</h2>
+                    <% albumsByArtist.forEach(artist => { %>
+                        <% if (artist && artist.length > 0) { %>            
+                            <% const singlesOfType = artist.filter(album => album.album_type === 'single'); %>               
+                            <% if (singlesOfType.length > 0) { %>                
+                                <% singlesOfType.forEach(single => { %>                
+                                    <% if (single.total_tracks == 1) { %>
+                                        <div class="track">
+                                            <div class="track-image">
+                                                <img src="<%= single.images[0].url %>" alt="<%= single.name %>">
+                                            </div>
+                                            <div class="track-info">
+                                                <% single.tracks.slice(0, 5).forEach(track=> { %>
+                                                    <li>
+                                                        <a href="/track/<%= track.id %>"><h2>
+                                                            <%= track.name %>
+                                                        </h2></a>
+                                                    </li>
+                                                <% }); %>
+                                                <% if (single.artists.length> 1) { %>
+                                                    <% single.artists.forEach((artist, index)=> { %>
+                                                        <% if (index===1) { %>
+                                                            ft. <a href="/artist/<%= artist.id %>"><%= artist.name %></a>
+                                                        <% } else if (index===2) { %>
+                                                            , <a href="/artist/<%= artist.id %>"><%= artist.name %></a>
+                                                        <% } else if (index===0) { %>
+                                                            <p>
+                                                                <a href="/artist/<%= artist.id %>"><%= artist.name %></a>
+                                                        <% } %>
+                                                    <% }); %>
+                                                        - <%= single.name %>
+                                                    </p>
+                                                <% } else { %>
+                                                        <p>
+                                                            <a href="/artist/<%= single.artists[0].id %>"><%= single.artists[0].name %></a> - <%= single.name %>
+                                                        </p>
+                                                <% } %>
+                                            </div>
+                                        </div>
+                                    <% } %>
+                                <% }); %>
+                            <% } %>
+                        <% } %>
+                    <% }); %>
+
+                    
+                </div>
+
+                <div id="epcontainer" class="EP-container animate__animated animate__fadeIn">
+                    <h2>EPs</h2>
+                    <% albumsByArtist.forEach(artist => { %>
+                        <% if (artist && artist.length > 0) { %>
+                            <% const EpsOfType = artist.filter(album => album.album_type === 'single'); %>
+                            <% if (EpsOfType.length > 0) { %>
+                                <% EpsOfType.forEach(ep => { %>
+                                    <% if (ep.total_tracks> 1) { %>
+                                        <div class="album-preset">
+                                            <div class="album-preset-image">
+                                                <img src="<%= ep.images[0].url %>" alt="<%= ep.name %>">
+                                            </div>
+                                            <div class="album-preset-info">
+                                                <h2><%= ep.name %></h2> <h3><a href="/artist/<%= ep.artists[0].id %>"><%= ep.artists[0].name %></a></h3>   <h4><%= ep.release_date %></h4>
+                                                <div class="tracks-section">
+                                                    <!-- Affichez les cinq premières pistes -->
+                                                    <ul class="track-list">
+                                                        <% ep.tracks.slice(0, 5).forEach(track=> { %>
+                                                            <li>
+                                                                <a href="/track/<%= track.id %>"><%= track.name %></a>
+                                                            </li>
+                                                        <% }); %>
+                                                    </ul>
+        
+                                                    <% if (ep.total_tracks > 5) { %> <!-- Affichez le reste des pistes dans la div cachée -->
+                                                        <div class="hidden-tracks">
+                                                            <ul>
+                                                                <% ep.tracks.slice(5).forEach(track=> { %>
+                                                                    <li>
+                                                                        <a href="/track/<%= track.id %>"><%= track.name %></a>
+                                                                    </li>
+                                                                <% }); %>
+                                                            </ul>
+                                                        </div>
+        
+                                                        <!-- Ajoutez un bouton "Afficher plus" -->
+                                                        <div class="btn-center-div">
+                                                            <button class="show-more-button" onclick="toggleTracks(this)">
+                                                                <div class="button-content">
+                                                                    <span>Afficher plus</span>
+                                                                    <i class="material-icons" id="arrow-icon">keyboard_arrow_down</i>
+                                                                </div>
+                                                            </button>
+                                                        </div>
+                                                    <% } %>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    <% } else {%>
+                                    <% } %>
+                                <% }); %>
+                            <% } %>
+                        <% } %>
+                    <% }); %>
+                </div>
+            </div>
+        </main>
 
         <script src="../test/h.js"></script>
+
+        <script>
+            function toggleTracks(button) {
+                const parentSection = button.closest('.tracks-section'); // Trouve la section parente du bouton
+                const hiddenTracks = parentSection.querySelector('.hidden-tracks'); // Sélectionne la section des pistes cachées à l'intérieur de la section parente
+                const arrowIcon = button.querySelector('#arrow-icon');
+
+
+                if (hiddenTracks.style.maxHeight) {
+                    // La div est actuellement étendue, rétractez-la
+                    hiddenTracks.style.maxHeight = null;
+                    button.innerHTML = '<i class="material-icons" id="arrow-icon">keyboard_arrow_down</i> Afficher plus';
+                } else {
+                    // La div est actuellement rétractée, étendez-la
+                    hiddenTracks.style.maxHeight = hiddenTracks.scrollHeight + 'px';
+                    button.innerHTML = '<i class="material-icons" id="arrow-icon">keyboard_arrow_up</i> Réduire';
+                }
+            }
+                
+                document.addEventListener("DOMContentLoaded", function () {
+                
+                    // Sélectionnez toutes les divs avec la classe "checkbox-container"
+                    const checkboxContainers = document.querySelectorAll('.checkbox-container');
+
+                    // Parcourez chaque div
+                    checkboxContainers.forEach(function (container) {
+                        // Récupérez l'ID de la checkbox associée à cette div
+                        const containerId = container.id.slice(0, -17);
+
+                        const containerIdChanged = containerId + "containerCheckbox";
+
+                        console.log(containerId + " " + containerIdChanged);
+
+                        // Ajoutez un gestionnaire d'événements pour le clic sur la div
+                        container.addEventListener('click', function () {
+                            // Récupérez la checkbox correspondante
+                            const checkbox = document.getElementById(containerIdChanged);
+
+                            // Inversez l'état de la checkbox
+                            checkbox.checked = !checkbox.checked;
+
+                            updateDisplay(`${containerId}container`, `${containerId}CheckboxContainer`);
+                        });
+                    });
+                    // Fonction pour mettre à jour l'affichage en fonction de l'état des cases à cocher
+                    function updateDisplay(id, containerId) {
+                        console.log(id);
+                        // Récupérer l'état de la case à cocher correspondante
+                        const checkbox = document.getElementById(`${id.toLowerCase()}Checkbox`);
+                        const container = document.getElementById(containerId);
+                        
+                        // Afficher ou masquer la div en fonction de l'état de la case à cocher
+                        document.getElementById(id).style.display = checkbox.checked ? 'block' : 'none';
+                        // Mettre à jour l'opacité en fonction de la sélection
+                        container.style.opacity = checkbox.checked ? 1 : 0.5;
+                    }
+            });
+            
+        
+    </script>
+        </script>
 
         <!-- Compiled and minified JavaScript -->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>

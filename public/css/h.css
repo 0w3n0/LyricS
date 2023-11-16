@@ -489,4 +489,190 @@ h1 {
   -o-object-fit: cover;
      object-fit: cover;
   border-radius: 8px;
+}
+
+.album-preset {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  overflow: hidden;
+  max-width: 100%;
+  margin: 0px 3vw 1vh 3vw;
+}
+
+.album-preset-image {
+  margin: 2vh 0vw 1vh 0vw;
+}
+
+.album-preset-image img {
+  width: 150px;
+  height: 150px;
+  -o-object-fit: cover;
+     object-fit: cover;
+  border-radius: 8px;
+  min-width: 80px;
+}
+
+.album-preset-info {
+  width: 300px;
+  flex-grow: 1;
+  padding: 10px;
+  overflow: hidden;
+}
+
+.album-preset-info h2 {
+  margin: 0;
+  font-size: 24px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
+}
+
+.album-preset-info h4 {
+  margin: 0;
+  font-size: 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
+}
+
+.album-preset-info h3 {
+  margin: 0;
+  font-size: 18px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
+}
+
+.album-preset-info p {
+  margin: 0;
+  font-size: 14px;
+  color: #888;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.hidden-tracks {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease-out;
+}
+
+.show-more-button {
+  color: black;
+}
+
+.show-more-button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* Centre les éléments horizontalement dans le conteneur flex */
+  text-align: center;
+  /* Centre le texte horizontalement */
+}
+
+.button-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.material-icons {
+  margin-top: 0px;
+  /* Ajustez la marge pour séparer le texte de l'icône */
+}
+
+.btn-center-div {
+  display: flex;
+  justify-content: center;
+  margin: 3vh 0px 0px 0px;
+}
+
+.tracks-section .track-list,
+.tracks-section .hidden-tracks {
+  text-align: center;
+}
+.tracks-section .track-list li,
+.tracks-section .hidden-tracks li {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+/* Style pour la checkbox "Single" */
+#singleCheckboxContainer {
+  background-color: #98FB98;
+  /* Rouge clair */
+  border-radius: 20px;
+  padding: 10px;
+  display: block;
+  margin-bottom: 10px;
+  width: 80px;
+  text-align: center;
+}
+
+/* Style pour la checkbox "Album" */
+#albumCheckboxContainer {
+  background-color: #D8BFD8;
+  /* Violet clair */
+  border-radius: 20px;
+  padding: 10px;
+  display: block;
+  margin-bottom: 10px;
+  width: 80px;
+  text-align: center;
+}
+
+/* Style pour la checkbox "EP" */
+#epCheckboxContainer {
+  background-color: #FFB6C1;
+  /* Vert pastel */
+  border-radius: 20px;
+  padding: 10px;
+  display: block;
+  margin-bottom: 10px;
+  width: 80px;
+  text-align: center;
+}
+
+/* Style de base pour toutes les divs checkbox */
+.cbDiv {
+  margin: 10px;
+  cursor: pointer;
+  margin: 0px 25px 0px 25px;
+}
+
+/* Style pour la div checkbox lorsqu'elle est sélectionnée */
+div[selected] {
+  opacity: 0.5; /* Opacité réduite */
+  transition: opacity 1s;
+}
+
+/* Cacher la checkbox tout en maintenant la div cliquable */
+input[type=checkbox] {
+  opacity: 0;
+  pointer-events: none;
+}
+
+#btn-switch-holder {
+  display: flex;
+  justify-content: center;
+}
+
+#singlecontainer .track {
+  background-color: #98FB98;
+}
+
+#albumcontainer .album-preset {
+  background-color: #D8BFD8;
+}
+
+#epcontainer .album-preset {
+  background-color: #FFB6C1;
 }/*# sourceMappingURL=h.css.map */

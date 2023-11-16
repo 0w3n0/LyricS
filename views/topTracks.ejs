@@ -17,14 +17,16 @@
     <%- include('header.ejs') %>
     <main>
 
-        <section id="shortt">
-            <h1>Top 10 des titres les plus écoutés (shortterm)</h1>
+        <h1 id="h1Modif">Top 10 des titres les plus écoutés (shortterm)</h1>
 
             <div class="button-container-timerange">
                 <button class="btn-timerange-self" onclick="displayvisiblesection('shortt')">4 Semaines</button>
                 <button class="btn-timerange-self" onclick="displayvisiblesection('midt')">6 Mois</button>
                 <button class="btn-timerange-self" onclick="displayvisiblesection('longt')">All Time</button>
             </div>
+
+        <section id="shortt" class="animate__animated animate__fadeIn">
+
             <div class="tracks-container">
 
                 <% recentTopTracks.forEach(track=> { %>
@@ -69,13 +71,8 @@
         </section>
 
 
-        <section id="midt" class="section-visible">
-            <h1>Top 10 des titres les plus écoutés (midterm)</h1>
-            <div class="button-container-timerange">
-                <button class="btn-timerange-self" onclick="displayvisiblesection('shortt')">4 Semaines</button>
-                <button class="btn-timerange-self" onclick="displayvisiblesection('midt')">6 Mois</button>
-                <button class="btn-timerange-self" onclick="displayvisiblesection('longt')">All Time</button>
-            </div>
+        <section id="midt" class="section-visible animate__animated animate__fadeIn">
+            
             <div class="tracks-container">
 
                 <% MidTermTopTracks.forEach(track=> { %>
@@ -92,19 +89,19 @@
                             <% if (track.artists.length> 1) { %>
                                 <% track.artists.forEach((artist, index)=> { %>
                                     <% if (index===1) { %>
-                                        ft. <%= artist.name %>
+                                        ft. <a href="/artist/<%= artist.id %>"><%= artist.name %></a>
                                             <% } else if (index===2) { %>
-                                                , <%= artist.name %>
+                                                , <a href="/artist/<%= artist.id %>"><%= artist.name %></a>
                                                     <% } else if (index===0) { %>
                                                         <p>
-                                                            <%= artist.name %>
+                                                            <a href="/artist/<%= artist.id %>"><%= artist.name %></a>
                                                                 <% } %>
                                                                     <% }); %>
                                                                         - <%= track.album.name %>
                                                         </p>
                                                         <% } else { %>
                                                             <p>
-                                                                <%= track.artists[0].name %> - <%= track.album.name %>
+                                                                <a href="/artist/<%= track.artists[0].id %>"><%= track.artists[0].name %></a> - <%= track.album.name %>
                                                             </p>
                                                             <% } %>
                         </div>
@@ -118,14 +115,7 @@
             </div>
         </section>
 
-        <section id="longt" class="section-visible">
-
-            <h1>Top 10 des titres les plus écoutés (longterm)</h1>
-            <div class="button-container-timerange">
-                <button class="btn-timerange-self" onclick="displayvisiblesection('shortt')">4 Semaines</button>
-                <button class="btn-timerange-self" onclick="displayvisiblesection('midt')">6 Mois</button>
-                <button class="btn-timerange-self" onclick="displayvisiblesection('longt')">All Time</button>
-            </div>
+        <section id="longt" class="section-visible animate__animated animate__fadeIn">
 
             <div class="tracks-container">
 
@@ -143,19 +133,19 @@
                             <% if (track.artists.length> 1) { %>
                                 <% track.artists.forEach((artist, index)=> { %>
                                     <% if (index===1) { %>
-                                        ft. <%= artist.name %>
+                                        ft. <a href="/artist/<%= artist.id %>"><%= artist.name %></a>
                                             <% } else if (index===2) { %>
-                                                , <%= artist.name %>
+                                                , <a href="/artist/<%= artist.id %>"><%= artist.name %></a>
                                                     <% } else if (index===0) { %>
                                                         <p>
-                                                            <%= artist.name %>
+                                                            <a href="/artist/<%= artist.id %>"><%= artist.name %></a>
                                                                 <% } %>
                                                                     <% }); %>
                                                                         - <%= track.album.name %>
                                                         </p>
                                                         <% } else { %>
                                                             <p>
-                                                                <%= track.artists[0].name %> - <%= track.album.name %>
+                                                                <a href="/artist/<%= track.artists[0].id %>"><%= track.artists[0].name %></a> - <%= track.album.name %>
                                                             </p>
                                                             <% } %>
                         </div>
@@ -177,20 +167,24 @@
 
     <script>
         function displayvisiblesection(id) {
+            const h1Modif = document.getElementById("h1Modif");
 
             if (id === "shortt") {
+                h1Modif.innerHTML = "Top 10 des titres les plus écoutés (shortterm)";
                 document.getElementById("midt").style.display = 'none';
                 document.getElementById("longt").style.display = 'none';
                 document.getElementById(id).style.display = 'block';
             }
 
             else if (id === "midt") {
+                h1Modif.innerHTML = "Top 10 des titres les plus écoutés (midterm)";
                 document.getElementById("shortt").style.display = 'none';
                 document.getElementById("longt").style.display = 'none';
                 document.getElementById(id).style.display = 'block';
             }
 
             else if (id === "longt") {
+                h1Modif.innerHTML = "Top 10 des titres les plus écoutés (longterm)";
                 document.getElementById("shortt").style.display = 'none';
                 document.getElementById("midt").style.display = 'none';
                 document.getElementById(id).style.display = 'block';
