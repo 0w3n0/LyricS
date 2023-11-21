@@ -15,8 +15,92 @@
 
 <body>
     <%- include('header.ejs') %>
+        <div class="track-image-details" id="t-i-d-radar">
+            <h2 id="h2-radar">Radar de sorties</h2>
+            <h4 id="h4-radar">Retrouvez les dernières sorties de vos artistes favoris en tout simplicité.</h4>
 
+            <div id="preview-radar">
+                <% let foundFirstAlbum = false; %>
+                <div class="artists-container-home">
+                    <% albumsByArtist.forEach(artist => { %>
+                        <% if (artist && artist.length > 0 && !foundFirstAlbum) { %>
+                            <% const albumsOfType = artist.filter(album => album.album_type === 'album'); %>
+                            <% if (albumsOfType.length > 0) { %>
+                                <% albumsOfType.forEach(album => { %>
+                                    <div class="artist-home">
+                                        <div class="artist-image">
+                                            <img src="<%= album.images[0].url %>" alt="<%= album.name %>">
+                                        </div>
+                                        <div>
+                                            <h2><%= album.name %></h2> 
+                                            <h2 class="artist-name">
+                                                <h3><a href="/artist/<%= album.artists[0].id %>"><%= album.artists[0].name %></a></h3> 
+                                            </h2> 
+                                        </div>
+                                    </div>
+                                    <% foundFirstAlbum = true; %>
+                                <% }); %>
+                            <% } %>
+                        <% } %>
+                    <% }); %>
+                </div>
+                
+                <% let foundFirstSingle = false; %>
+                <div class="artists-container-home">
+                    <% albumsByArtist.forEach(artist => { %>
+                        <% if (artist && artist.length > 0 && !foundFirstSingle) { %>
+                            <% const albumsOfType = artist.filter(album => album.album_type === 'single'); %>
+                            <% if (albumsOfType.length > 0) { %>
+                                <% albumsOfType.forEach(album => { %>
+                                    <div class="artist-home">
+                                        <div class="artist-image">
+                                            <img src="<%= album.images[0].url %>" alt="<%= album.name %>">
+                                        </div>
+                                        <div>
+                                            <h2><%= album.name %></h2> 
+                                            <h2 class="artist-name">
+                                                <h3><a href="/artist/<%= album.artists[0].id %>"><%= album.artists[0].name %></a></h3> 
+                                            </h2> 
+                                        </div>
+                                    </div>
+                                    <% foundFirstSingle = true; %>
+                                <% }); %>
+                            <% } %>
+                        <% } %>
+                    <% }); %>
+                </div>        
+
+                <% let foundFirstEp = false; %>
+                <div class="artists-container-home">
+                    <% albumsByArtist.forEach(artist => { %>
+                        <% if (artist && artist.length > 0 && !foundFirstEp) { %>
+                            <% const albumsOfType = artist.filter(album => album.album_type === 'single'); %>
+                            <% if (albumsOfType.length > 0) { %>
+                                <% albumsOfType.forEach(album => { %>
+                                    <% if (album.total_tracks> 3) { %>
+                                        <div class="artist-home">
+                                            <div class="artist-image">
+                                                <img src="<%= album.images[0].url %>" alt="<%= album.name %>">
+                                            </div>
+                                            <div>
+                                                <h2><%= album.name %></h2> 
+                                                <h2 class="artist-name">
+                                                    <h3><a href="/artist/<%= album.artists[0].id %>"><%= album.artists[0].name %></a></h3> 
+                                                </h2> 
+                                            </div>
+                                        </div>
+                                        <% foundFirstEp = true; %>
+                                    <% } %>
+                                <% }); %>
+                            <% } %>
+                        <% } %>
+                    <% }); %>
+                </div>        
+            </div>
+        </div>
         <main>
+            
+            
 
             <div class="tracks-container">
 
@@ -202,6 +286,26 @@
                 </div>
             </div>
         </main>
+
+        <style>
+            .track-image-details {
+              position: relative;
+              /* width: 500px;
+              height: 300px; */
+              background: no-repeat center center;
+              background-image: url('../images/svg/MagicPattern.design.svg');
+              background-size: cover;
+            }
+    
+            .track-image-details::after {
+              content: "";
+              position: absolute;
+              width: 100%;
+              height: 100%;
+              backdrop-filter: blur(10px);
+              pointer-events: none;
+            }
+          </style>
 
         <script src="../test/h.js"></script>
 

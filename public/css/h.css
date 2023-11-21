@@ -461,6 +461,18 @@ h1 {
   margin: 0 auto;
   z-index: 1;
 }
+.track-image-details #h4-radar {
+  width: 55vw;
+  text-align: center;
+}
+.track-image-details #h2-radar,
+.track-image-details #h4-radar {
+  color: black;
+}
+
+#t-i-d-radar {
+  gap: 50px;
+}
 
 #TDetails {
   padding: 0px 0px 5rem 0px;
@@ -650,7 +662,8 @@ h1 {
 
 /* Style pour la div checkbox lorsqu'elle est sélectionnée */
 div[selected] {
-  opacity: 0.5; /* Opacité réduite */
+  opacity: 0.5;
+  /* Opacité réduite */
   transition: opacity 1s;
 }
 
@@ -675,4 +688,49 @@ input[type=checkbox] {
 
 #epcontainer .album-preset {
   background-color: #FFB6C1;
+}
+
+#preview-radar {
+  flex-wrap: wrap;
+  z-index: 1;
+  display: flex;
+}
+#preview-radar .artist-image img {
+  border-radius: 50%;
+  width: 100px;
+  min-width: 100px;
+  height: 100px;
+  min-height: 100px;
+  margin: 0 auto;
+  z-index: 1;
+}
+#preview-radar .artists-container-home {
+  margin: 0vh 1vw 0vh 1vw;
+}
+#preview-radar .artist-home {
+  padding: 10px 0px 16px 0px;
+  width: 30vw;
+  margin: 0;
+  display: flex;
+  flex-flow: wrap;
+  justify-content: center;
+}
+#preview-radar .artist-home h2 {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
+  color: black;
+  z-index: 1;
+  font-size: 0.9rem;
+  padding: 10px 0px 0px 0px;
+  width: 23vw;
+}
+#preview-radar .artist-home h3 {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
+  font-size: 0.9rem;
+  width: 23vw;
 }/*# sourceMappingURL=h.css.map */

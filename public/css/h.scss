@@ -491,6 +491,20 @@ $gray: #9b9b9b;
 		margin: 0 auto;
 		z-index: 1;
 	}
+
+	#h4-radar {
+		width: 55vw;
+		text-align: center;
+	}
+
+	#h2-radar,
+	#h4-radar {
+		color: black;
+	}
+}
+
+#t-i-d-radar {
+	gap: 50px;
 }
 
 
@@ -652,7 +666,7 @@ $gray: #9b9b9b;
 	display: block;
 	margin-bottom: 10px;
 	width: 80px;
-    text-align: center;
+	text-align: center;
 }
 
 /* Style pour la checkbox "Album" */
@@ -664,7 +678,7 @@ $gray: #9b9b9b;
 	display: block;
 	margin-bottom: 10px;
 	width: 80px;
-    text-align: center;
+	text-align: center;
 }
 
 /* Style pour la checkbox "EP" */
@@ -676,42 +690,93 @@ $gray: #9b9b9b;
 	display: block;
 	margin-bottom: 10px;
 	width: 80px;
-    text-align: center;
+	text-align: center;
 }
 
 /* Style de base pour toutes les divs checkbox */
 .cbDiv {
-    margin: 10px;
-    cursor: pointer;
+	margin: 10px;
+	cursor: pointer;
 	margin: 0px 25px 0px 25px;
 }
 
 /* Style pour la div checkbox lorsqu'elle est sélectionnée */
 div[selected] {
-    opacity: 0.5; /* Opacité réduite */
+	opacity: 0.5;
+	/* Opacité réduite */
 	transition: opacity 1s;
 }
 
 /* Cacher la checkbox tout en maintenant la div cliquable */
 input[type="checkbox"] {
-    opacity: 0;
-    pointer-events: none;
+	opacity: 0;
+	pointer-events: none;
 }
 
-#btn-switch-holder{
+#btn-switch-holder {
 	display: flex;
 	justify-content: center;
 }
 
-#singlecontainer .track{
+#singlecontainer .track {
 	background-color: #98FB98;
 }
 
-#albumcontainer .album-preset{
+#albumcontainer .album-preset {
 	background-color: #D8BFD8;
 }
 
-#epcontainer .album-preset{
+#epcontainer .album-preset {
 	background-color: #FFB6C1;
 }
 
+#preview-radar {
+	flex-wrap: wrap;
+	z-index: 1;
+	display: flex;
+
+	.artist-image img {
+		border-radius: 50%;
+		width: 100px;
+		min-width: 100px;
+		height: 100px;
+		min-height: 100px;
+		margin: 0 auto;
+		z-index: 1;
+	}
+
+	.artists-container-home {
+		margin: 0vh 1vw 0vh 1vw;
+	}
+
+	.artist-home {
+		padding: 10px 0px 16px 0px;
+		width: 30vw;
+		margin: 0;
+		display: flex;
+		flex-flow: wrap;
+		justify-content: center;
+
+		h2 {
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			text-align: center;
+			color: black;
+			z-index: 1;
+			font-size: 0.90rem;
+			padding: 10px 0px 0px 0px;
+			width: 23vw;
+		}
+
+		h3 {
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			text-align: center;
+			font-size: 0.90rem;
+			width: 23vw;
+
+		}
+	}
+}

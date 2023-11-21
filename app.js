@@ -202,7 +202,7 @@ app.get('/radar', async (req, res) => {
         const currentDate = new Date();
 
         // Définir l'heure, les minutes, les secondes et les millisecondes à 0
-        currentDate.setHours(0, 0, 0, 0);
+        currentDate.setHours(0, 3, 0, 0);
 
         // Récupérer le jour de la semaine (0 pour dimanche, 1 pour lundi, ..., 6 pour samedi)
         const currentDay = currentDate.getDay();
@@ -228,13 +228,18 @@ app.get('/radar', async (req, res) => {
         const uniqueFollowedArtists = Array.from(new Set(allFollowedArtists.map(artist => artist.id)))
           .map(artistId => allFollowedArtists.find(artist => artist.id === artistId));
 
-        // Pour chaque artiste, récupérez les albums ajoutés entre les dates spécifiées
-        const albumsPromises = uniqueFollowedArtists.map(artist =>
-          getRecentAlbumsForArtist(accessToken, artist.id, startDate, endDate)
-        );
+        console.log('Noms des artistes suivis :', uniqueFollowedArtists.map(artist => artist.name));
+
+        // // Pour chaque artiste, récupérez les albums ajoutés entre les dates spécifiées
+        // const albumsPromises = uniqueFollowedArtists.map(artist =>
+        //   getRecentAlbumsForArtist(accessToken, artist.id, startDate, endDate)
+        // );
 
         // Attendre que toutes les promesses se résolvent
-        const albumsByArtist = await Promise.all(albumsPromises);
+        // Utilisation dans la route /radar
+        const albumsByArtist = await Promise.all(uniqueFollowedArtists.map(artist =>
+          getRecentReleasesForArtist(accessToken, artist.id)
+        ));
 
         console.log('Noms des artistes dans albumsByArtist :', albumsByArtist.map(artistAlbums => artistAlbums.length > 0 ? artistAlbums[0].artists[0].name : 'Aucun album trouvé'));
         console.log('Liste complète des artistes suivis :', albumsByArtist);
@@ -283,11 +288,52 @@ const getAllFollowedArtists = async (accessToken) => {
     // Incrémentez l'offset pour obtenir la page suivante
     offset += limit;
   }
-
   return allArtists;
 };
 
-const getRecentAlbumsForArtist = async (accessToken, artistId, startDate, endDate) => {
+// const getRecentAlbumsForArtist = async (accessToken, artistId, startDate, endDate) => {
+//   try {
+//     const response = await axios.get(`https://api.spotify.com/v1/artists/${artistId}/albums`, {
+//       headers: {
+//         'Authorization': `Bearer ${accessToken}`
+//       },
+//       params: {
+//         include_groups: 'album,single,appears_on',
+//         limit: 50
+//       }
+//     });
+
+//     const albums = response.data.items;
+
+//     // Filtrer les albums ajoutés entre les dates spécifiées
+//     const filteredAlbums = albums.filter(album => {
+//       const releaseDate = new Date(album.release_date);
+//       return releaseDate >= startDate && releaseDate <= endDate;
+//     });
+
+//     // Ajouter les détails des pistes à chaque album
+//     const albumsWithTracks = await Promise.all(filteredAlbums.map(async album => {
+//       try {
+//         const tracksResponse = await axios.get(`https://api.spotify.com/v1/albums/${album.id}/tracks?limit=50`, {
+//           headers: {
+//             'Authorization': `Bearer ${accessToken}`
+//           }
+//         });
+//         album.tracks = tracksResponse.data.items;
+//       } catch (error) {
+//         console.error(`Erreur lors de la récupération des pistes pour l'album ${album.name}:`, error);
+//       }
+//       return album;
+//     }));
+
+//     return albumsWithTracks;
+//   } catch (error) {
+//     console.error('Erreur lors de la récupération des albums pour l\'artiste:', error);
+//     throw error; // Propagez l'erreur pour la gérer en aval
+//   }
+// };
+
+const getRecentReleasesForArtist = async (accessToken, artistId) => {
   try {
     const response = await axios.get(`https://api.spotify.com/v1/artists/${artistId}/albums`, {
       headers: {
@@ -295,39 +341,44 @@ const getRecentAlbumsForArtist = async (accessToken, artistId, startDate, endDat
       },
       params: {
         include_groups: 'album,single,appears_on',
-        limit: 50
+        limit: 10, // Vous pouvez ajuster la limite selon vos besoins
+        market: 'from_token' // Pour obtenir les sorties disponibles dans le pays de l'utilisateur
       }
     });
 
-    const albums = response.data.items;
+    const releases = response.data.items;
 
-    // Filtrer les albums ajoutés entre les dates spécifiées
-    const filteredAlbums = albums.filter(album => {
-      const releaseDate = new Date(album.release_date);
-      return releaseDate >= startDate && releaseDate <= endDate;
+    // Filtrer les sorties pour inclure uniquement celles qui ont été ajoutées récemment
+    const currentDate = new Date();
+    const recentReleases = releases.filter(release => {
+      const releaseDate = new Date(release.release_date);
+      const daysAgo = Math.floor((currentDate - releaseDate) / (1000 * 60 * 60 * 24));
+      return daysAgo <= 30; // Vous pouvez ajuster la période de temps selon vos besoins
     });
 
-    // Ajouter les détails des pistes à chaque album
-    const albumsWithTracks = await Promise.all(filteredAlbums.map(async album => {
+    // Ajouter les détails des pistes à chaque sortie
+    const releasesWithTracks = await Promise.all(recentReleases.map(async release => {
       try {
-        const tracksResponse = await axios.get(`https://api.spotify.com/v1/albums/${album.id}/tracks?limit=50`, {
+        const tracksResponse = await axios.get(`https://api.spotify.com/v1/albums/${release.id}/tracks?limit=50`, {
           headers: {
             'Authorization': `Bearer ${accessToken}`
           }
         });
-        album.tracks = tracksResponse.data.items;
+        release.tracks = tracksResponse.data.items;
       } catch (error) {
-        console.error(`Erreur lors de la récupération des pistes pour l'album ${album.name}:`, error);
+        console.error(`Erreur lors de la récupération des pistes pour la sortie ${release.name}:`, error);
       }
-      return album;
+      return release;
     }));
 
-    return albumsWithTracks;
+    return releasesWithTracks;
   } catch (error) {
-    console.error('Erreur lors de la récupération des albums pour l\'artiste:', error);
+    console.error('Erreur lors de la récupération des sorties pour l\'artiste:', error);
     throw error; // Propagez l'erreur pour la gérer en aval
   }
 };
+
+
 
 app.get('/track/:id', async (req, res) => {
   if (req.isAuthenticated()) {
