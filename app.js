@@ -10,11 +10,7 @@ const app = express();
 app.set('view engine', 'ejs');
 app.use(express.static('public'));
 
-// Configurations de l'API Spotify
-const clientId = 'd2dd99251bd9480b81222d8e8b26f6dd'; // LyricS
-// const clientId = '862c7dacc1604e9db43fc7bcf899ca4c'; // LyricS BP
-const clientSecret = 'c6948141c6814b08826dc09eda752ef3';  // LyricS
-// const clientSecret = 'cb373d236ee74396aedddcfbabdd9d9e';  // LyricS BP
+// mettre ici les trucs
 const redirectUri = 'http://localhost:3000/auth/spotify/callback';
 
 app.get('/', (req, res) => {
