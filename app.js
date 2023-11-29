@@ -10,6 +10,8 @@ const app = express();
 app.set('view engine', 'ejs');
 app.use(express.static('public'));
 
+app.use(express.json());
+
 // Configurations de l'API Spotify
 const clientId = 'd2dd99251bd9480b81222d8e8b26f6dd'; // LyricS
 // const clientId = '862c7dacc1604e9db43fc7bcf899ca4c'; // LyricS BP
@@ -63,7 +65,7 @@ passport.use(new SpotifyStrategy({
 
 // Rediriger l'utilisateur vers l'authentification Spotify
 app.get('/auth/spotify', passport.authenticate('spotify', {
-  scope: ['user-top-read', 'user-follow-read']
+  scope: ['user-top-read', 'user-follow-read', 'playlist-modify-private', 'playlist-read-private']
 }));
 
 // Gérer la réponse de Spotify
@@ -73,9 +75,21 @@ app.get('/auth/spotify/callback',
     if (!req.user) {
       return res.status(401).send('Erreur d\'authentification avec Spotify');
     }
-    res.redirect('/top-tracks');
+    res.redirect('/home');
   }
 );
+
+app.get('/logout', function (req, res, next) {
+  if (req.isAuthenticated()) {
+    req.logout(function (err) {
+      if (err) { return next(err); }
+      res.redirect('/');
+    });
+  }
+  else {
+    res.redirect("/");
+  }
+});
 
 // Récupération des 10 titres les plus écoutés
 app.get('/top-tracks', async (req, res) => {
@@ -122,6 +136,70 @@ app.get('/top-tracks', async (req, res) => {
           });
 
         res.render('topTracks', { recentTopTracks, MidTermTopTracks, longTermTopTracks, displayName });
+      } catch (error) {
+        console.error('Erreur lors de la récupération des données Spotify:', error);
+        res.status(500).send('Erreur lors de la récupération des données Spotify');
+      }
+    }
+
+    else {
+      console.log("Access Token:", req.user.accessToken, "<br/><br/><br/><br/><br/><br/><br/><br/>"); // Ajout de cette ligne
+
+      console.error("Erreur: Access Token non disponible");
+      res.status(401).send("Erreur: Accès non autorisé");
+    }
+  }
+  else {
+    res.redirect('/'); // Redirigez l'utilisateur vers l'authentification si ce n'est pas déjà fait
+  }
+}
+);
+
+// Récupération des 10 titres les plus écoutés
+app.get('/top-artists', async (req, res) => {
+  if (req.isAuthenticated()) {
+    const user = req.user; // Accédez aux informations de l'utilisateur à partir de req.user
+    const accessToken = user.accessToken; // Exemple : Accédez à l'accessToken de l'utilisateur
+    if (req.user && req.user.accessToken) {
+      try {
+        const [recentResponse, MidTermResponse, longTermResponse] = await Promise.all([
+          axios.get('https://api.spotify.com/v1/me/top/artists?time_range=short_term', {
+            headers: {
+              'Authorization': `Bearer ${req.user.accessToken}`
+            }
+          }),
+          axios.get('https://api.spotify.com/v1/me/top/artists?time_range=medium_term', {
+            headers: {
+              'Authorization': `Bearer ${req.user.accessToken}`
+            }
+          }),
+
+          axios.get('https://api.spotify.com/v1/me/top/artists?time_range=long_term', {
+            headers: {
+              'Authorization': `Bearer ${req.user.accessToken}`
+            }
+          })
+        ]);
+
+        const recentTopArtists = recentResponse.data.items;
+        const MidTermTopArtists = MidTermResponse.data.items;
+        const longTermTopArtists = longTermResponse.data.items;
+        const displayName = user.displayName;
+
+        axios.get('https://api.spotify.com/v1/me', {
+          headers: {
+            'Authorization': `Bearer ${accessToken}`
+          }
+        })
+          .then(response => {
+            const displayName = response.data.display_name;
+            console.log('Pseudonyme de l\'utilisateur :', displayName);
+          })
+          .catch(error => {
+            console.error('Erreur lors de la récupération du pseudonyme de l\'utilisateur :', error);
+          });
+
+        res.render('topArtists', { recentTopArtists, MidTermTopArtists, longTermTopArtists, displayName });
       } catch (error) {
         console.error('Erreur lors de la récupération des données Spotify:', error);
         res.status(500).send('Erreur lors de la récupération des données Spotify');
@@ -231,16 +309,16 @@ app.get('/radar', async (req, res) => {
 
         console.log('Noms des artistes suivis :', uniqueFollowedArtists.map(artist => artist.name));
 
-        // // Pour chaque artiste, récupérez les albums ajoutés entre les dates spécifiées
-        // const albumsPromises = uniqueFollowedArtists.map(artist =>
-        //   getRecentAlbumsForArtist(accessToken, artist.id, startDate, endDate)
-        // );
-
-        // Attendre que toutes les promesses se résolvent
-        // Utilisation dans la route /radar
         const albumsByArtist = await Promise.all(uniqueFollowedArtists.map(artist =>
           getRecentReleasesForArtist(accessToken, artist.id)
         ));
+
+        // Ajoutez les trackIds à chaque album
+        albumsByArtist.forEach(artistAlbums => {
+          artistAlbums.forEach(album => {
+            album.trackIds = album.tracks.map(track => track.id);
+          });
+        });
 
         console.log('Noms des artistes dans albumsByArtist :', albumsByArtist.map(artistAlbums => artistAlbums.length > 0 ? artistAlbums[0].artists[0].name : 'Aucun album trouvé'));
         console.log('Liste complète des artistes suivis :', albumsByArtist);
@@ -292,48 +370,6 @@ const getAllFollowedArtists = async (accessToken) => {
   return allArtists;
 };
 
-// const getRecentAlbumsForArtist = async (accessToken, artistId, startDate, endDate) => {
-//   try {
-//     const response = await axios.get(`https://api.spotify.com/v1/artists/${artistId}/albums`, {
-//       headers: {
-//         'Authorization': `Bearer ${accessToken}`
-//       },
-//       params: {
-//         include_groups: 'album,single,appears_on',
-//         limit: 50
-//       }
-//     });
-
-//     const albums = response.data.items;
-
-//     // Filtrer les albums ajoutés entre les dates spécifiées
-//     const filteredAlbums = albums.filter(album => {
-//       const releaseDate = new Date(album.release_date);
-//       return releaseDate >= startDate && releaseDate <= endDate;
-//     });
-
-//     // Ajouter les détails des pistes à chaque album
-//     const albumsWithTracks = await Promise.all(filteredAlbums.map(async album => {
-//       try {
-//         const tracksResponse = await axios.get(`https://api.spotify.com/v1/albums/${album.id}/tracks?limit=50`, {
-//           headers: {
-//             'Authorization': `Bearer ${accessToken}`
-//           }
-//         });
-//         album.tracks = tracksResponse.data.items;
-//       } catch (error) {
-//         console.error(`Erreur lors de la récupération des pistes pour l'album ${album.name}:`, error);
-//       }
-//       return album;
-//     }));
-
-//     return albumsWithTracks;
-//   } catch (error) {
-//     console.error('Erreur lors de la récupération des albums pour l\'artiste:', error);
-//     throw error; // Propagez l'erreur pour la gérer en aval
-//   }
-// };
-
 const getRecentReleasesForArtist = async (accessToken, artistId) => {
   try {
     const response = await axios.get(`https://api.spotify.com/v1/artists/${artistId}/albums`, {
@@ -379,7 +415,207 @@ const getRecentReleasesForArtist = async (accessToken, artistId) => {
   }
 };
 
+// Ajoutez une route pour ajouter un album à la playlist
+app.post('/add-album-to-playlist', async (req, res) => {
 
+  const accessToken = req.user.accessToken;
+
+  try {
+
+    const albumId = req.body.albumId;
+    const playlistId = req.body.playlistId;
+
+
+    // Obtenez les pistes de l'album
+    const albumTracks = await getAlbumTracks(albumId, accessToken);
+
+    // Obtenez les URI des pistes
+    const trackUris = albumTracks.map(track => track.uri);
+
+    // Ajoutez les pistes à la playlist en utilisant Axios
+    const addTracksToPlaylistResponse = await axios.post(
+      `https://api.spotify.com/v1/playlists/${playlistId}/tracks`,
+      { uris: trackUris },
+      {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+
+    console.log('Album ajouté à la playlist : ', addTracksToPlaylistResponse.data);
+    res.send('Album ajouté à la playlist!');
+  } catch (error) {
+    console.error('Erreur lors de l\'ajout de l\'album à la playlist : ', error);
+    res.status(500).send('Erreur lors de l\'ajout de l\'album à la playlist.');
+  }
+});
+
+// Fonction pour obtenir les pistes d'un album
+async function getAlbumTracks(albumId, accessToken) {
+  try {
+    // Utilisez Axios pour appeler l'API Spotify et obtenir les pistes de l'album
+    const response = await axios.get(`https://api.spotify.com/v1/albums/${albumId}/tracks`, {
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+      },
+    });
+
+    return response.data.items;
+  } catch (error) {
+    console.error('Erreur lors de la récupération des pistes de l\'album : ', error);
+    throw error;
+  }
+}
+
+app.get('/check-playlist', async (req, res) => {
+  try {
+    const accessToken = req.user.accessToken;
+
+    // Vérifiez l'existence de la playlist "LyricS Playlist"
+    const lyricSPlaylistExists = await checkLyricSPlaylist(accessToken);
+
+    // Répondez avec l'état d'existence de la playlist
+    res.json({ exists: lyricSPlaylistExists });
+  } catch (error) {
+    console.error('Erreur lors de la vérification de l\'existence de la playlist "LyricS Playlist" :', error);
+    res.status(500).json({ exists: false, error: 'Erreur lors de la vérification de l\'existence de la playlist "LyricS Playlist"' });
+  }
+});
+
+// Fonction pour vérifier l'existence de la playlist "LyricS Playlist"
+const checkLyricSPlaylist = async (accessToken) => {
+  try {
+    const response = await axios.get(`https://api.spotify.com/v1/me/playlists?limit=50`, {
+      headers: {
+        'Authorization': `Bearer ${accessToken}`
+      }
+    });
+
+    const playlists = response.data.items;
+    console.log(playlists);
+
+    // Vérifiez si la playlist "LyricS Playlist" existe
+    return playlists.find(playlist => playlist.name === 'LyricS Playlist');
+  } catch (error) {
+    console.error('Erreur lors de la création de la playlist "LyricS Playlist" :', error.response?.data || error.message);
+    throw error;
+  }
+};
+
+app.post('/create-playlist', async (req, res) => {
+  console.log('Requête POST reçue pour la création de playlist');
+  try {
+    const accessToken = req.user.accessToken;
+
+    // Créez la playlist "LyricS Playlist"
+    const createdPlaylist = await createLyricSPlaylist(accessToken);
+
+    // Répondez avec le résultat de la création de la playlist
+    res.json({ success: true, playlist: createdPlaylist });
+  } catch (error) {
+    console.error('Erreur lors de la création de la playlist "LyricS Playlist" :', error);
+    res.status(500).json({ success: false, error: 'Erreur lors de la création de la playlist "LyricS Playlist"', details: error.message });
+  }
+});
+
+const createLyricSPlaylist = async (accessToken) => {
+  try {
+    const userId = await getUserId(accessToken);
+    console.log("USERID post = " + userId);
+
+    const response = await axios.post(`https://api.spotify.com/v1/users/${userId}/playlists`, {
+      name: 'LyricS Playlist',
+      description: 'Nouvelles sorties LyricS',
+      public: false
+    }, {
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error('Erreur lors de la création de la playlist "LyricS Playlist" :', error);
+    throw error;
+  }
+};
+
+const getUserId = async (accessToken) => {
+  try {
+    const response = await axios.get('https://api.spotify.com/v1/me', {
+      headers: {
+        'Authorization': `Bearer ${accessToken}`
+      }
+    });
+    console.log(response.data.id);
+    return response.data.id;
+  } catch (error) {
+    console.error('Erreur lors de la récupération de l\'ID de l\'utilisateur :', error);
+    throw error;
+  }
+};
+
+// app.post('/add-tracks', async (req, res) => {
+//   console.log('Requête POST reçue pour l\'ajout de pistes à la playlist');
+
+//   try {
+//     // Récupérer les données de la requête
+//     const { trackIds } = req.body;
+//     const accessToken = req.user.accessToken;
+
+//     // Appeler une fonction pour ajouter les pistes à la playlist Spotify
+//     await addTracksToPlaylist(accessToken, trackIds);
+
+//     // Répondre avec succès
+//     res.json({ success: true });
+//   } catch (error) {
+//     console.error('Erreur lors de l\'ajout de pistes à la playlist :', error);
+//     res.status(500).json({ success: false, error: 'Erreur lors de l\'ajout de pistes à la playlist', details: error.message });
+//   }
+// });
+
+// const addTracksToPlaylist = async (accessToken, trackIds) => {
+//   try {
+//     // Effectuez une requête vers la route côté serveur pour vérifier l'existence de la playlist
+//     const response = await fetch(`/check-playlist`);
+//     const result = await response.json();
+
+//     if (result.exists) {
+//       // La playlist existe, vous pouvez ajouter la musique à la playlist ici
+//       console.log('La playlist existe, ajoutez la musique à la playlist.');
+//       // Ajoutez ici la logique pour ajouter la musique à la playlist existante
+
+//       const playlistId = result.id;
+//       console.log(playlistId);
+//     } else {
+//       // La playlist n'existe pas, vous pouvez la créer et ajouter la musique
+//       console.log('La playlist n\'existe pas, créez la playlist et ajoutez la musique.');
+
+//       // Effectuez une nouvelle requête pour créer la playlist
+//       const createPlaylistResponse = await fetch('/create-playlist', {
+//         method: 'POST',
+//         headers: {
+//           'Content-Type': 'application/json',
+//         },
+//         body: JSON.stringify({ playlistId }),
+//       });
+
+//       const createPlaylistResult = await createPlaylistResponse.json();
+
+//       if (createPlaylistResult.success) {
+//         console.log('Playlist créée avec succès. Ajoutez la musique à la playlist.');
+//         // Ajoutez ici la logique pour ajouter la musique à la playlist nouvellement créée
+//       } else {
+//         console.error('Erreur lors de la création de la playlist :', createPlaylistResult.error);
+//       }
+//     }
+//   } catch (error) {
+//     console.error('Erreur lors de la vérification de l\'existence de la playlist :', error);
+//   }
+// };
 
 app.get('/track/:id', async (req, res) => {
   if (req.isAuthenticated()) {

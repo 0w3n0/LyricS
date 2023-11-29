@@ -17,7 +17,7 @@
     <%- include('header.ejs') %>
     <main>
 
-        <h1 id="h1Modif">Top 10 des titres les plus écoutés (shortterm)</h1>
+        <h1 id="h1Modif">Top 20 des titres les plus écoutés (shortterm)</h1>
 
             <div class="button-container-timerange">
                 <button class="btn-timerange-self" onclick="displayvisiblesection('shortt')">4 Semaines</button>
@@ -170,21 +170,21 @@
             const h1Modif = document.getElementById("h1Modif");
 
             if (id === "shortt") {
-                h1Modif.innerHTML = "Top 10 des titres les plus écoutés (shortterm)";
+                h1Modif.innerHTML = "Top 20 des titres les plus écoutés (shortterm)";
                 document.getElementById("midt").style.display = 'none';
                 document.getElementById("longt").style.display = 'none';
                 document.getElementById(id).style.display = 'block';
             }
 
             else if (id === "midt") {
-                h1Modif.innerHTML = "Top 10 des titres les plus écoutés (midterm)";
+                h1Modif.innerHTML = "Top 20 des titres les plus écoutés (midterm)";
                 document.getElementById("shortt").style.display = 'none';
                 document.getElementById("longt").style.display = 'none';
                 document.getElementById(id).style.display = 'block';
             }
 
             else if (id === "longt") {
-                h1Modif.innerHTML = "Top 10 des titres les plus écoutés (longterm)";
+                h1Modif.innerHTML = "Top 20 des titres les plus écoutés (longterm)";
                 document.getElementById("shortt").style.display = 'none';
                 document.getElementById("midt").style.display = 'none';
                 document.getElementById(id).style.display = 'block';

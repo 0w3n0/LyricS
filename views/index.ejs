@@ -21,7 +21,7 @@
 
             <div class="title-button-holder">
                 <h2>Derniers artistes favoris</h2>
-                <button><a href="/top-tracks">VOIR PLUS</a></button>
+                <button><a href="/top-artists">VOIR PLUS</a></button>
             </div>
 
             <div class="artists-container-home">
@@ -30,9 +30,9 @@
                         <div class="artist-image">
                             <% if(artist.images.length> 0) { %>
                                 <img src="<%= artist.images[0].url %>" alt="<%= artist.name %>">
-                                <% } else { %>
+                            <% } else { %>
                                     <img src="../images/user-defaut-pp.jpg" alt="<%= artist.name %>">
-                                    <% } %>
+                            <% } %>
                         </div>
                         <div>
                             <h2 class="artist-name">

@@ -48,22 +48,25 @@
                 <% let foundFirstSingle = false; %>
                 <div class="artists-container-home">
                     <% albumsByArtist.forEach(artist => { %>
-                        <% if (artist && artist.length > 0 && !foundFirstSingle) { %>
+                        <% if (artist && artist.length > 0) { %>
                             <% const albumsOfType = artist.filter(album => album.album_type === 'single'); %>
                             <% if (albumsOfType.length > 0) { %>
                                 <% albumsOfType.forEach(album => { %>
-                                    <div class="artist-home">
-                                        <div class="artist-image">
-                                            <img src="<%= album.images[0].url %>" alt="<%= album.name %>">
+                                    <% if (!foundFirstSingle) { %>
+                                        <div class="artist-home">
+                                            <div class="artist-image">
+                                                <img src="<%= album.images[0].url %>" alt="<%= album.name %>">
+                                            </div>
+                                            <div>
+                                                <h2><%= album.name %></h2> 
+                                                <h2 class="artist-name">
+                                                    <h3><a href="/artist/<%= album.artists[0].id %>"><%= album.artists[0].name %></a></h3> 
+                                                </h2> 
+                                            </div>
                                         </div>
-                                        <div>
-                                            <h2><%= album.name %></h2> 
-                                            <h2 class="artist-name">
-                                                <h3><a href="/artist/<%= album.artists[0].id %>"><%= album.artists[0].name %></a></h3> 
-                                            </h2> 
-                                        </div>
-                                    </div>
-                                    <% foundFirstSingle = true; %>
+                                        <% foundFirstSingle = true; %>
+                                    <% } else { %>
+                                    <% } %>
                                 <% }); %>
                             <% } %>
                         <% } %>
@@ -102,7 +105,9 @@
             
             
 
-            <div class="tracks-container">
+            <div class="tracks-container" style="min-height: 100vh;">
+
+                <button id="yourAddToPlaylistIconId">JE SUIS UN BOUTON POUR CREER TA PLAYLIST HIHI</button>
 
                 <h2>Albums récents des artistes que vous suivez :</h2>
 
@@ -137,8 +142,10 @@
                                             <img src="<%= album.images[0].url %>" alt="<%= album.name %>">
                                         </div>
                                         <div class="album-preset-info">
-                                            <h2><%= album.name %></h2> 
-                                            <h3><a href="/artist/<%= album.artists[0].id %>"><%= album.artists[0].name %></a></h3> 
+                                            <h2><%= album.name %></h2>
+                                            <i class="menu-icon ion-md-home"></i>
+                                            <span class="menu-name"><i class="material-icons recupDatasInsert" data-id="<%= album.id %>" onclick="addAlbumToPlaylist('<%= album.id %>')">playlist</i></span>
+                                            <h3><a href="/artist/<%= album.artists[0].id %>"><%= album.artists[0].name %></a></h3>
                                             <h4><%= album.release_date %></h4>
                                             <div class="tracks-section">
         
@@ -188,6 +195,8 @@
                             <% if (singlesOfType.length > 0) { %>                
                                 <% singlesOfType.forEach(single => { %>                
                                     <% if (single.total_tracks == 1) { %>
+                                        <% const trackIds = single.trackIds; 
+                                        console.log(`Voici les ids de l'single ${single.name} : ${trackIds}`);%>
                                         <div class="track">
                                             <div class="track-image">
                                                 <img src="<%= single.images[0].url %>" alt="<%= single.name %>">
@@ -219,6 +228,10 @@
                                                         </p>
                                                 <% } %>
                                             </div>
+                                            <div>
+                                                <i class="menu-icon ion-md-home"></i>
+                                                <span class="menu-name"><i class="material-icons recupDatasInsert" data-id="<%= single.id %>" onclick="addAlbumToPlaylist('<%= single.id %>')">playlist</i></span>
+                                            </div>
                                         </div>
                                     <% } %>
                                 <% }); %>
@@ -237,9 +250,13 @@
                             <% if (EpsOfType.length > 0) { %>
                                 <% EpsOfType.forEach(ep => { %>
                                     <% if (ep.total_tracks> 1) { %>
+                                        <% const trackIds = ep.trackIds; 
+                                        console.log(`Voici les ids de l'ep ${ep.name} : ${trackIds}`);%>
                                         <div class="album-preset">
                                             <div class="album-preset-image">
                                                 <img src="<%= ep.images[0].url %>" alt="<%= ep.name %>">
+                                                <i class="menu-icon ion-md-home"></i>
+                                                <span class="menu-name"><i class="material-icons recupDatasInsert" data-id="<%= ep.id %>" onclick="addAlbumToPlaylist('<%= ep.id %>')">playlist</i></span>
                                             </div>
                                             <div class="album-preset-info">
                                                 <h2><%= ep.name %></h2> <h3><a href="/artist/<%= ep.artists[0].id %>"><%= ep.artists[0].name %></a></h3>   <h4><%= ep.release_date %></h4>
@@ -307,8 +324,6 @@
             }
           </style>
 
-        <script src="../test/h.js"></script>
-
         <script>
             function toggleTracks(button) {
                 const parentSection = button.closest('.tracks-section'); // Trouve la section parente du bouton
@@ -366,9 +381,150 @@
                     }
             });
             
-        
-    </script>
+            // Au clic sur l'icône pour ajouter à la playlist
+            // document.getElementById('yourAddToPlaylistIconId').addEventListener('click', async () => {
+            
+            // playlistUtils.js
+
+            document.getElementById('yourAddToPlaylistIconId').addEventListener('click', async () => {
+                try {
+                    // Effectuez une requête vers la route côté serveur pour vérifier l'existence de la playlist
+                    const response = await fetch('/check-playlist');
+                    const result = await response.json();
+                    console.log("result :" + result);
+
+                    if (result.exists) {
+                        // La playlist existe, vous pouvez ajouter la musique à la playlist ici
+                        console.log('La playlist existe, ajoutez la musique à la playlist.');
+                    } else {
+                        // La playlist n'existe pas, vous pouvez la créer et ajouter la musique
+                        console.log('La playlist n\'existe pas, créez la playlist et ajoutez la musique.');
+                    }
+                } catch (error) {
+                    console.error('Erreur lors de la vérification de l\'existence de la playlist :', error);
+                }
+            });
+
+            // const addTracksToPlaylist = async (accessToken, trackIds) => {
+            //     try {
+            //         // Effectuez une requête vers la route côté serveur pour vérifier l'existence de la playlist
+            //         const response = await fetch(`/check-playlist`);
+            //         const result = await response.json();
+            //         const playlistId = 0;
+
+            //         if (result.exists) {
+            //             // La playlist existe, vous pouvez ajouter la musique à la playlist ici
+            //             console.log('La playlist existe, ajoutez la musique à la playlist.');
+            //             // Ajoutez ici la logique pour ajouter la musique à la playlist existante
+
+            //             const playlistId = result.exists.id;
+            //             console.log(playlistId);
+            //         } else {
+            //             // La playlist n'existe pas, vous pouvez la créer et ajouter la musique
+            //             console.log('La playlist n\'existe pas, créez la playlist et ajoutez la musique.');
+                        
+            //             // Effectuez une nouvelle requête pour créer la playlist
+            //             const createPlaylistResponse = await fetch('/create-playlist', { 
+            //                 method: 'POST',
+            //                 headers: {
+            //                     'Content-Type': 'application/json',
+            //                 },
+            //                 body: JSON.stringify({ playlistId }),
+            //             });
+                        
+            //             const createPlaylistResult = await createPlaylistResponse.json();
+
+            //             if (createPlaylistResult.success) {
+            //                 console.log('Playlist créée avec succès. Ajoutez la musique à la playlist.');
+            //                 // Ajoutez ici la logique pour ajouter la musique à la playlist nouvellement créée
+            //             } else {
+            //                 console.error('Erreur lors de la création de la playlist :', createPlaylistResult.error);
+            //             }
+            //         }
+            //         // Ajoutez les pistes à la playlist
+            //         const addTracksResponse = await fetch('/add-tracks', {
+            //             method: 'POST',
+            //             headers: {
+            //                 'Content-Type': 'application/json',
+            //             },
+            //             body: JSON.stringify({ playlistId, trackIds }),
+            //         });
+            //         const addTracksResult = await addTracksResponse.json();
+
+            //         if (addTracksResult.success) {
+            //             console.log('Pistes ajoutées avec succès à la playlist');
+            //         } else {
+            //             console.error('Erreur lors de l\'ajout des pistes à la playlist:', addTracksResult.error);
+            //         }
+            //     } catch (error) {
+            //         console.error('Erreur lors de la vérification de l\'existence de la playlist :', error);
+            //     }
+            // };
+
+            async function addAlbumToPlaylist(album_Id) {
+                    try {
+                        let playlistId = 0;
+                    // Effectuez une requête vers la route côté serveur pour vérifier l'existence de la playlist
+                        const response_check = await fetch(`/check-playlist`);
+                        const result_check = await response_check.json();
+
+                        console.log(result_check);
+
+                        if (result_check.exists) {
+                            // La playlist existe, vous pouvez ajouter la musique à la playlist ici
+                            console.log('La playlist existe, ajoutez la musique à la playlist.');
+                            // Ajoutez ici la logique pour ajouter la musique à la playlist existante
+
+                            playlistId = result_check.exists.id;
+                            console.log(playlistId);
+                        } else {
+                            // La playlist n'existe pas, vous pouvez la créer et ajouter la musique
+                            console.log('La playlist n\'existe pas, créez la playlist et ajoutez la musique.');
+
+                            // Effectuez une nouvelle requête pour créer la playlist
+                            const createPlaylistResponse = await fetch('/create-playlist', {
+                                method: 'POST',
+                                headers: {
+                                'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify({ playlistId }),
+                            });
+
+                            const createPlaylistResult = await createPlaylistResponse.json();
+                            console.log(createPlaylistResult);
+                            playlistId = createPlaylistResult.playlist.id;
+
+                            if (createPlaylistResult.success) {
+                                
+                                console.log('Playlist créée avec succès. Ajoutez la musique à la playlist.');
+
+                            } else {
+                                console.error('Erreur lors de la création de la playlist :', createPlaylistResult.error);
+                            }
+                        }
+
+                        // Utilisez fetch pour appeler la nouvelle route sans recharger la page
+                        const response = await fetch('/add-album-to-playlist', {
+                            method: 'POST',
+                            headers: {
+                            'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                            albumId: album_Id,
+                            playlistId : playlistId, // Remplacez par l'ID de l'album que vous souhaitez ajouter
+                            }),
+                        });
+
+                        const result = await response.json();
+                    
+                    // Vous pouvez ajouter ici du code pour gérer la réponse si nécessaire
+                    } catch (error) {
+                    console.error('Erreur lors de l\'ajout de l\'album à la playlist : ', error);
+                    // Vous pouvez ajouter ici du code pour gérer les erreurs si nécessaire
+                    }
+                }
         </script>
+        
 
         <!-- Compiled and minified JavaScript -->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
@@ -376,3 +532,4 @@
 </body>
 
 </html>
+
