@@ -65,7 +65,7 @@ passport.use(new SpotifyStrategy({
 
 // Rediriger l'utilisateur vers l'authentification Spotify
 app.get('/auth/spotify', passport.authenticate('spotify', {
-  scope: ['user-top-read', 'user-follow-read', 'playlist-modify-private', 'playlist-read-private']
+  scope: ['user-top-read', 'user-follow-read', 'playlist-modify-private', 'playlist-read-private', 'user-follow-modify']
 }));
 
 // Gérer la réponse de Spotify
@@ -269,6 +269,96 @@ app.get('/search', async (req, res) => {
   }
 }
 );
+// Ajoutez ce point de terminaison pour récupérer les abonnements aux artistes
+app.get('/following', async (req, res) => {
+  if (req.isAuthenticated()) {
+    const user = req.user;
+    const accessToken = user.accessToken;
+    try {
+      // Effectuez une requête vers l'API Spotify pour obtenir les artistes suivis
+      const response = await axios.get('https://api.spotify.com/v1/me/following?type=artist&limit=50', {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`
+        }
+      });
+
+      const artists = response.data.artists.items;
+
+      // Renvoyez la liste des artistes suivis à la vue
+      res.render('following', { artists, displayName: user.displayName });
+    } catch (error) {
+      console.error('Erreur lors de la récupération des artistes suivis :', error.response?.data || error.message);
+      res.status(500).send('Erreur lors de la récupération des artistes suivis');
+    }
+  } else {
+    res.redirect('/');
+  }
+});
+
+app.get('/check-following', async (req, res) => {
+  if (req.isAuthenticated()) {
+    const user = req.user;
+    const accessToken = user.accessToken;
+    try {
+      // Effectuez une requête vers l'API Spotify pour obtenir les artistes suivis
+      const response = await axios.get('https://api.spotify.com/v1/me/following?type=artist&limit=50', {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`
+        }
+      });
+
+      const artists = response.data.artists.items;
+
+      res.json({ artists });
+    } catch (error) {
+      console.error('Erreur lors de la récupération des artistes suivis :', error.response?.data || error.message);
+      res.status(500).send('Erreur lors de la récupération des artistes suivis');
+    }
+  } else {
+    res.redirect('/');
+  }
+});
+
+app.post('/unfollow-artist', async (req, res) => {
+  try {
+    const { artistId } = req.body;
+    const accessToken = req.user.accessToken;
+
+    // Effectuez une requête vers l'API Spotify pour se désabonner de l'artiste
+    await axios.delete(`https://api.spotify.com/v1/me/following?type=artist&ids=${artistId}`, {
+      headers: {
+        'Authorization': `Bearer ${accessToken}`
+      }
+    });
+
+    // Répondez avec succès
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Erreur lors du désabonnement de l\'artiste :', error.response?.data || error.message);
+    res.status(500).json({ success: false, error: 'Erreur lors du désabonnement de l\'artiste' });
+  }
+});
+
+app.post('/follow-artist', async (req, res) => {
+  try {
+    const { artistId } = req.body;
+    const accessToken = req.user.accessToken;
+
+    // Effectuez une requête vers l'API Spotify pour s'abonner à l'artiste
+    await axios.put(`https://api.spotify.com/v1/me/following?type=artist&ids=${artistId}`, null, {
+      headers: {
+        'Authorization': `Bearer ${accessToken}`
+      }
+    });
+
+    // Répondez avec succès
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Erreur lors de l\'abonnement à l\'artiste :', error.response?.data || error.message);
+    res.status(500).json({ success: false, error: 'Erreur lors de l\'abonnement à l\'artiste' });
+  }
+});
+
 // truc où les artistes sont 2 fois dedans et
 app.get('/radar', async (req, res) => {
   if (req.isAuthenticated()) {
@@ -281,7 +371,7 @@ app.get('/radar', async (req, res) => {
         const currentDate = new Date();
 
         // Définir l'heure, les minutes, les secondes et les millisecondes à 0
-        currentDate.setHours(0, 3, 0, 0);
+        currentDate.setHours(1, 0, 0, 0);
 
         // Récupérer le jour de la semaine (0 pour dimanche, 1 pour lundi, ..., 6 pour samedi)
         const currentDay = currentDate.getDay();
@@ -322,7 +412,7 @@ app.get('/radar', async (req, res) => {
 
         console.log('Noms des artistes dans albumsByArtist :', albumsByArtist.map(artistAlbums => artistAlbums.length > 0 ? artistAlbums[0].artists[0].name : 'Aucun album trouvé'));
         console.log('Liste complète des artistes suivis :', albumsByArtist);
-        res.render('radarManager', { albumsByArtist, displayName: user.displayName });
+        res.render('radarManager', { albumsByArtist, displayName: user.displayName, endDate, startDate });
       } catch (error) {
         console.error('Erreur lors de la récupération des données Spotify:', error);
         res.status(500).send('Erreur lors de la récupération des données Spotify');

@@ -27,18 +27,22 @@
             <div class="artists-container-home">
                 <% Home_infos_artists_datas.forEach(artist=> { %>
                     <div class="artist-home">
-                        <div class="artist-image">
-                            <% if(artist.images.length> 0) { %>
-                                <img src="<%= artist.images[0].url %>" alt="<%= artist.name %>">
-                            <% } else { %>
-                                    <img src="../images/user-defaut-pp.jpg" alt="<%= artist.name %>">
-                            <% } %>
-                        </div>
-                        <div>
-                            <h2 class="artist-name">
-                                <%= artist.name %>
-                            </h2>
-                        </div>
+                        <a href="/artist/<%= artist.id %>">
+                            <div class="artist-image">
+                                <% if(artist.images.length> 0) { %>
+                                    <img src="<%= artist.images[0].url %>" alt="<%= artist.name %>">
+                                    <% } else { %>
+                                        <img src="../images/user-defaut-pp.jpg" alt="<%= artist.name %>">
+                                        <% } %>
+                            </div>
+                            <div>
+                                <h2 class="artist-name">
+
+                                    <%= artist.name %>
+
+                                </h2>
+                            </div>
+                        </a>
                     </div>
                     <% }); %>
             </div>
@@ -52,6 +56,7 @@
 
                 <% Home_infos_tracks_datas.forEach(track=> { %>
                     <div class="artist-home">
+                        <a href="/track/<%= track.id %>">
                         <div class="artist-image">
                             <% if(track.album.images[0].url){ %>
                                 <img src="<%= track.album.images[0].url %>" alt="<%= track.name %>">
@@ -60,11 +65,11 @@
                                     <% } %>
                         </div>
                         <div id="home-track-infos">
-                            <a href="/track/<%= track.id %>">
+                            
                                 <h2 class="artist-name">
                                     <%= track.name %>
                                 </h2>
-                            </a>
+                            
                             <% if (track.artists.length> 1) { %>
                                 <% track.artists.forEach((artist, index)=> { %>
                                     <% if (index===1) { %>
@@ -84,6 +89,7 @@
                                                             </p>
                                                             <% } %>
                         </div>
+                    </a>
                     </div>
                     <% }); %>
             </div>

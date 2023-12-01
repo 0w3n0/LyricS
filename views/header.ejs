@@ -21,12 +21,6 @@
                         <span class="menu-name"><i class="material-icons">search</i></span>
                     </a>
                 </li>
-                <!-- <li class="menu-item">
-                    <a href="#" class="menu-link">
-                        <i class="menu-icon ion-md-cart"></i>
-                        <span class="menu-name">Cart</span>
-                    </a>
-                </li> -->
                 <li class="menu-item">
                     <a href="/radar" class="menu-link">
                         <i class="menu-icon ion-md-search"></i>
@@ -34,12 +28,89 @@
                     </a>
                 </li>
                 <li class="menu-item">
-                    <a href="#" class="menu-link">
-                        <i class="menu-icon ion-md-contact"></i>
-                        <span class="menu-name">Account</span>
+                    <a href="/following" class="menu-link">
+                        <i class="menu-icon ion-md-search"></i>
+                        <span class="menu-name"><i class="material-icons">person</i></span>
                     </a>
                 </li>
             </ul>
         </div>
     </nav>
 </header>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Vérifiez si l'URL actuelle correspond à la page radar
+        if (window.location.pathname === '/radar') {
+            // Désactivez le lien en supprimant l'attribut href
+            var radarLink = document.querySelector('.menu-item a[href="/radar"]');
+            radarLink.removeAttribute('href');
+            radarLink.classList.add('disabled-link'); // Vous pouvez également ajouter une classe pour styliser le lien désactivé
+            radarLink.classList.add('is-active');
+
+            let radarIconLocation = document.querySelector('.is-active');
+            radarIconLocation.classList.remove('is-active');
+            
+        }
+
+        if (window.location.pathname === '/search') {
+            // Désactivez le lien en supprimant l'attribut href
+            var searchLink = document.querySelector('.menu-item a[href="/search"]');
+            searchLink.removeAttribute('href');
+            searchLink.classList.add('disabled-link'); // Vous pouvez également ajouter une classe pour styliser le lien désactivé
+            searchLink.classList.add('is-active');
+
+            let searchIconLocation = document.querySelector('.is-active');
+            searchIconLocation.classList.remove('is-active');
+            
+        }
+
+        if (window.location.pathname === '/top-tracks') {
+            // Désactivez le lien en supprimant l'attribut href
+            var toptracksLink = document.querySelector('.menu-item a[href="/top-tracks"]');
+            toptracksLink.removeAttribute('href');
+            toptracksLink.classList.add('disabled-link'); // Vous pouvez également ajouter une classe pour styliser le lien désactivé
+            toptracksLink.classList.add('is-active');
+
+            let toptracksIconLocation = document.querySelector('.is-active');
+            toptracksIconLocation.classList.remove('is-active');
+            
+        }
+
+        if (window.location.pathname === '/top-artists') {
+            // Désactivez le lien en supprimant l'attribut href
+            var topartistsLink = document.querySelector('.menu-item a[href="/top-artists"]');
+            topartistsLink.removeAttribute('href');
+            topartistsLink.classList.add('disabled-link'); // Vous pouvez également ajouter une classe pour styliser le lien désactivé
+            topartistsLink.classList.add('is-active');
+
+            let topartistsIconLocation = document.querySelector('.is-active');
+            topartistsIconLocation.classList.remove('is-active');
+            
+        }
+
+        if (window.location.pathname === '/top-menu') {
+            // Désactivez le lien en supprimant l'attribut href
+            var topmenuLink = document.querySelector('.menu-item a[href="/top-menu"]');
+            topmenuLink.removeAttribute('href');
+            topmenuLink.classList.add('disabled-link'); // Vous pouvez également ajouter une classe pour styliser le lien désactivé
+            topmenuLink.classList.add('is-active');
+
+            let topmenuIconLocation = document.querySelector('.is-active');
+            topmenuIconLocation.classList.remove('is-active');
+            
+        }
+
+        if (window.location.pathname === '/following') {
+            // Désactivez le lien en supprimant l'attribut href
+            var followingLink = document.querySelector('.menu-item a[href="/following"]');
+            followingLink.removeAttribute('href');
+            followingLink.classList.add('disabled-link'); // Vous pouvez également ajouter une classe pour styliser le lien désactivé
+            followingLink.classList.add('is-active');
+
+            let followingIconLocation = document.querySelector('.is-active');
+            followingIconLocation.classList.remove('is-active');
+            
+        }
+    });
+</script>

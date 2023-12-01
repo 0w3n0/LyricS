@@ -23,22 +23,25 @@
                 <% let foundFirstAlbum = false; %>
                 <div class="artists-container-home">
                     <% albumsByArtist.forEach(artist => { %>
-                        <% if (artist && artist.length > 0 && !foundFirstAlbum) { %>
+                        <% if (artist && artist.length > 0) { %>
                             <% const albumsOfType = artist.filter(album => album.album_type === 'album'); %>
                             <% if (albumsOfType.length > 0) { %>
                                 <% albumsOfType.forEach(album => { %>
-                                    <div class="artist-home">
-                                        <div class="artist-image">
-                                            <img src="<%= album.images[0].url %>" alt="<%= album.name %>">
+                                    <% if (!foundFirstAlbum) { %>
+                                        <div class="artist-home" id="album_t-i-d-radar">
+                                            <div class="artist-image">
+                                                <img src="<%= album.images[0].url %>" alt="<%= album.name %>">
+                                            </div>
+                                            <div>
+                                                <h2><%= album.name %></h2> 
+                                                <h2 class="artist-name">
+                                                    <h3><a href="/artist/<%= album.artists[0].id %>"><%= album.artists[0].name %></a></h3> 
+                                                </h2> 
+                                            </div>
                                         </div>
-                                        <div>
-                                            <h2><%= album.name %></h2> 
-                                            <h2 class="artist-name">
-                                                <h3><a href="/artist/<%= album.artists[0].id %>"><%= album.artists[0].name %></a></h3> 
-                                            </h2> 
-                                        </div>
-                                    </div>
-                                    <% foundFirstAlbum = true; %>
+                                        <% foundFirstAlbum = true; %>
+                                    <% } else { %>
+                                    <% } %>
                                 <% }); %>
                             <% } %>
                         <% } %>
@@ -53,7 +56,7 @@
                             <% if (albumsOfType.length > 0) { %>
                                 <% albumsOfType.forEach(album => { %>
                                     <% if (!foundFirstSingle) { %>
-                                        <div class="artist-home">
+                                        <div class="artist-home" id="single_t-i-d-radar">
                                             <div class="artist-image">
                                                 <img src="<%= album.images[0].url %>" alt="<%= album.name %>">
                                             </div>
@@ -76,23 +79,25 @@
                 <% let foundFirstEp = false; %>
                 <div class="artists-container-home">
                     <% albumsByArtist.forEach(artist => { %>
-                        <% if (artist && artist.length > 0 && !foundFirstEp) { %>
+                        <% if (artist && artist.length > 0) { %>
                             <% const albumsOfType = artist.filter(album => album.album_type === 'single'); %>
                             <% if (albumsOfType.length > 0) { %>
                                 <% albumsOfType.forEach(album => { %>
-                                    <% if (album.total_tracks> 3) { %>
-                                        <div class="artist-home">
-                                            <div class="artist-image">
-                                                <img src="<%= album.images[0].url %>" alt="<%= album.name %>">
+                                    <% if (!foundFirstEp) { %>
+                                        <% if (album.total_tracks> 3) { %>
+                                            <div class="artist-home" id="ep_t-i-d-radar">
+                                                <div class="artist-image">
+                                                    <img src="<%= album.images[0].url %>" alt="<%= album.name %>">
+                                                </div>
+                                                <div>
+                                                    <h2><%= album.name %></h2> 
+                                                    <h2 class="artist-name">
+                                                        <h3><a href="/artist/<%= album.artists[0].id %>"><%= album.artists[0].name %></a></h3> 
+                                                    </h2> 
+                                                </div>
                                             </div>
-                                            <div>
-                                                <h2><%= album.name %></h2> 
-                                                <h2 class="artist-name">
-                                                    <h3><a href="/artist/<%= album.artists[0].id %>"><%= album.artists[0].name %></a></h3> 
-                                                </h2> 
-                                            </div>
-                                        </div>
-                                        <% foundFirstEp = true; %>
+                                            <% foundFirstEp = true; %>
+                                        <% } %>
                                     <% } %>
                                 <% }); %>
                             <% } %>
@@ -107,9 +112,7 @@
 
             <div class="tracks-container" style="min-height: 100vh;">
 
-                <button id="yourAddToPlaylistIconId">JE SUIS UN BOUTON POUR CREER TA PLAYLIST HIHI</button>
-
-                <h2>Albums récents des artistes que vous suivez :</h2>
+                <h2 class="h2-title">Albums récents des artistes que vous suivez :</h2>
 
                 <div id="btn-switch-holder">
                     <div class="cbDiv">
@@ -131,56 +134,60 @@
                 <% const albumTypes={ 'album' : 'Albums' , 'single' : 'Singles' , 'compilation' : 'Compilations' , 'appears_on' : 'Apparitions' }; %>
                     
                 <div id="albumcontainer" class="album-container animate__animated animate__fadeIn">
-                    <h2>Albums</h2>
+                    <h2 class="h2-title">Albums</h2>
                     <% albumsByArtist.forEach(artist => { %>
                         <% if (artist && artist.length > 0) { %>
                             <% const albumsOfType = artist.filter(album => album.album_type === 'album'); %>
                             <% if (albumsOfType.length > 0) { %>
                                 <% albumsOfType.forEach(album => { %>
-                                    <div class="album-preset">
-                                        <div class="album-preset-image">
-                                            <img src="<%= album.images[0].url %>" alt="<%= album.name %>">
-                                        </div>
-                                        <div class="album-preset-info">
-                                            <h2><%= album.name %></h2>
-                                            <i class="menu-icon ion-md-home"></i>
-                                            <span class="menu-name"><i class="material-icons recupDatasInsert" data-id="<%= album.id %>" onclick="addAlbumToPlaylist('<%= album.id %>')">playlist</i></span>
-                                            <h3><a href="/artist/<%= album.artists[0].id %>"><%= album.artists[0].name %></a></h3>
-                                            <h4><%= album.release_date %></h4>
-                                            <div class="tracks-section">
-        
-                                                <!-- Affichez les cinq premières pistes -->
-                                                <ul class="track-list">
-                                                    <% album.tracks.slice(0, 5).forEach(track=> { %>
-                                                        <li>
-                                                            <a href="/track/<%= track.id %>"><%= track.name %></a>
-                                                        </li>
-                                                    <% }); %>
-                                                </ul>
-        
-                                                <!-- Affichez le reste des pistes dans la div cachée -->
-                                                <div class="hidden-tracks">
-                                                    <ul>
-                                                        <% album.tracks.slice(5).forEach(track=> { %>
+                                    <% const releaseDate = new Date(album.release_date); %>
+                                    <% console.log(`Je m'appelle ${album.name} et je suis sorti ${releaseDate}`);%>
+                                    <% if (releaseDate >= startDate && releaseDate <= endDate) { %>
+                                        <div class="album-preset">
+                                            <div class="album-preset-image">
+                                                <img src="<%= album.images[0].url %>" alt="<%= album.name %>">
+                                            </div>
+                                            <div class="album-preset-info">
+                                                <i class="menu-icon ion-md-home"></i>
+                                                <span class="menu-name"><i class="material-icons recupDatasInsert" data-id="<%= album.id %>" onclick="addAlbumToPlaylist('<%= album.id %>')">playlist</i></span>
+                                                <h2><%= album.name %></h2>
+                                                <h3><a href="/artist/<%= album.artists[0].id %>"><%= album.artists[0].name %></a></h3>
+                                                <h4><%= album.release_date %></h4>
+                                                <div class="tracks-section">
+            
+                                                    <!-- Affichez les cinq premières pistes -->
+                                                    <ul class="track-list">
+                                                        <% album.tracks.slice(0, 5).forEach(track=> { %>
                                                             <li>
                                                                 <a href="/track/<%= track.id %>"><%= track.name %></a>
                                                             </li>
                                                         <% }); %>
                                                     </ul>
-                                                </div>
-        
-                                                <!-- Ajoutez un bouton "Afficher plus" -->
-                                                <div class="btn-center-div">
-                                                    <button class="show-more-button" onclick="toggleTracks(this)">
-                                                        <div class="button-content">
-                                                            <span>Afficher plus</span>
-                                                            <i class="material-icons" id="arrow-icon">keyboard_arrow_down</i>
-                                                        </div>
-                                                    </button>
+            
+                                                    <!-- Affichez le reste des pistes dans la div cachée -->
+                                                    <div class="hidden-tracks">
+                                                        <ul>
+                                                            <% album.tracks.slice(5).forEach(track=> { %>
+                                                                <li>
+                                                                    <a href="/track/<%= track.id %>"><%= track.name %></a>
+                                                                </li>
+                                                            <% }); %>
+                                                        </ul>
+                                                    </div>
+            
+                                                    <!-- Ajoutez un bouton "Afficher plus" -->
+                                                    <div class="btn-center-div">
+                                                        <button class="show-more-button" onclick="toggleTracks(this)">
+                                                            <div class="button-content">
+                                                                <span>Afficher plus</span>
+                                                                <i class="material-icons" id="arrow-icon">keyboard_arrow_down</i>
+                                                            </div>
+                                                        </button>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
+                                    <% } %>
                                 <% }); %>
                             <% } %>
                         <% } %>
@@ -188,52 +195,56 @@
                 </div>
                 
                 <div id="singlecontainer" class="single-container animate__animated animate__fadeIn">
-                    <h2>Singles</h2>
+                    <h2 class="h2-title">Singles</h2>
                     <% albumsByArtist.forEach(artist => { %>
                         <% if (artist && artist.length > 0) { %>            
                             <% const singlesOfType = artist.filter(album => album.album_type === 'single'); %>               
                             <% if (singlesOfType.length > 0) { %>                
-                                <% singlesOfType.forEach(single => { %>                
-                                    <% if (single.total_tracks == 1) { %>
-                                        <% const trackIds = single.trackIds; 
-                                        console.log(`Voici les ids de l'single ${single.name} : ${trackIds}`);%>
-                                        <div class="track">
-                                            <div class="track-image">
-                                                <img src="<%= single.images[0].url %>" alt="<%= single.name %>">
-                                            </div>
-                                            <div class="track-info">
-                                                <% single.tracks.slice(0, 5).forEach(track=> { %>
-                                                    <li>
-                                                        <a href="/track/<%= track.id %>"><h2>
-                                                            <%= track.name %>
-                                                        </h2></a>
-                                                    </li>
-                                                <% }); %>
-                                                <% if (single.artists.length> 1) { %>
-                                                    <% single.artists.forEach((artist, index)=> { %>
-                                                        <% if (index===1) { %>
-                                                            ft. <a href="/artist/<%= artist.id %>"><%= artist.name %></a>
-                                                        <% } else if (index===2) { %>
-                                                            , <a href="/artist/<%= artist.id %>"><%= artist.name %></a>
-                                                        <% } else if (index===0) { %>
-                                                            <p>
-                                                                <a href="/artist/<%= artist.id %>"><%= artist.name %></a>
-                                                        <% } %>
+                                <% singlesOfType.forEach(single => { %> 
+                                    <% const releaseDate = new Date(single.release_date); %>
+                                    <% console.log(`Je m'appelle ${single.name} et je suis sorti ${releaseDate}`);%>
+                                    <% if (releaseDate >= startDate && releaseDate <= endDate) { %>              
+                                        <% if (single.total_tracks == 1) { %>
+                                            <% const trackIds = single.trackIds; 
+                                            console.log(`Voici les ids de l'single ${single.name} : ${trackIds}`);%>
+                                            <div class="track">
+                                                <div class="track-image">
+                                                    <img src="<%= single.images[0].url %>" alt="<%= single.name %>">
+                                                </div>
+                                                <div class="track-info">
+                                                    <% single.tracks.slice(0, 5).forEach(track=> { %>
+                                                        <li>
+                                                            <a href="/track/<%= track.id %>"><h2>
+                                                                <%= track.name %>
+                                                            </h2></a>
+                                                        </li>
                                                     <% }); %>
-                                                        - <%= single.name %>
-                                                    </p>
-                                                <% } else { %>
-                                                        <p>
-                                                            <a href="/artist/<%= single.artists[0].id %>"><%= single.artists[0].name %></a> - <%= single.name %>
+                                                    <% if (single.artists.length> 1) { %>
+                                                        <% single.artists.forEach((artist, index)=> { %>
+                                                            <% if (index===1) { %>
+                                                                ft. <a href="/artist/<%= artist.id %>"><%= artist.name %></a>
+                                                            <% } else if (index===2) { %>
+                                                                , <a href="/artist/<%= artist.id %>"><%= artist.name %></a>
+                                                            <% } else if (index===0) { %>
+                                                                <p>
+                                                                    <a href="/artist/<%= artist.id %>"><%= artist.name %></a>
+                                                            <% } %>
+                                                        <% }); %>
+                                                            - <%= single.name %>
                                                         </p>
-                                                <% } %>
+                                                    <% } else { %>
+                                                            <p>
+                                                                <a href="/artist/<%= single.artists[0].id %>"><%= single.artists[0].name %></a> - <%= single.name %>
+                                                            </p>
+                                                    <% } %>
+                                                </div>
+                                                <div>
+                                                    <i class="menu-icon ion-md-home"></i>
+                                                    <span class="menu-name"><i class="material-icons recupDatasInsert" data-id="<%= single.id %>" onclick="addAlbumToPlaylist('<%= single.id %>')">playlist</i></span>
+                                                </div>
                                             </div>
-                                            <div>
-                                                <i class="menu-icon ion-md-home"></i>
-                                                <span class="menu-name"><i class="material-icons recupDatasInsert" data-id="<%= single.id %>" onclick="addAlbumToPlaylist('<%= single.id %>')">playlist</i></span>
-                                            </div>
-                                        </div>
-                                    <% } %>
+                                        <% } %>
+                                    <% } %>    
                                 <% }); %>
                             <% } %>
                         <% } %>
@@ -243,58 +254,63 @@
                 </div>
 
                 <div id="epcontainer" class="EP-container animate__animated animate__fadeIn">
-                    <h2>EPs</h2>
+                    <h2 class="h2-title">EPs</h2>
                     <% albumsByArtist.forEach(artist => { %>
                         <% if (artist && artist.length > 0) { %>
                             <% const EpsOfType = artist.filter(album => album.album_type === 'single'); %>
                             <% if (EpsOfType.length > 0) { %>
                                 <% EpsOfType.forEach(ep => { %>
-                                    <% if (ep.total_tracks> 1) { %>
-                                        <% const trackIds = ep.trackIds; 
-                                        console.log(`Voici les ids de l'ep ${ep.name} : ${trackIds}`);%>
-                                        <div class="album-preset">
-                                            <div class="album-preset-image">
-                                                <img src="<%= ep.images[0].url %>" alt="<%= ep.name %>">
-                                                <i class="menu-icon ion-md-home"></i>
-                                                <span class="menu-name"><i class="material-icons recupDatasInsert" data-id="<%= ep.id %>" onclick="addAlbumToPlaylist('<%= ep.id %>')">playlist</i></span>
-                                            </div>
-                                            <div class="album-preset-info">
-                                                <h2><%= ep.name %></h2> <h3><a href="/artist/<%= ep.artists[0].id %>"><%= ep.artists[0].name %></a></h3>   <h4><%= ep.release_date %></h4>
-                                                <div class="tracks-section">
-                                                    <!-- Affichez les cinq premières pistes -->
-                                                    <ul class="track-list">
-                                                        <% ep.tracks.slice(0, 5).forEach(track=> { %>
-                                                            <li>
-                                                                <a href="/track/<%= track.id %>"><%= track.name %></a>
-                                                            </li>
-                                                        <% }); %>
-                                                    </ul>
-        
-                                                    <% if (ep.total_tracks > 5) { %> <!-- Affichez le reste des pistes dans la div cachée -->
-                                                        <div class="hidden-tracks">
-                                                            <ul>
-                                                                <% ep.tracks.slice(5).forEach(track=> { %>
-                                                                    <li>
-                                                                        <a href="/track/<%= track.id %>"><%= track.name %></a>
-                                                                    </li>
-                                                                <% }); %>
-                                                            </ul>
-                                                        </div>
-        
-                                                        <!-- Ajoutez un bouton "Afficher plus" -->
-                                                        <div class="btn-center-div">
-                                                            <button class="show-more-button" onclick="toggleTracks(this)">
-                                                                <div class="button-content">
-                                                                    <span>Afficher plus</span>
-                                                                    <i class="material-icons" id="arrow-icon">keyboard_arrow_down</i>
-                                                                </div>
-                                                            </button>
-                                                        </div>
-                                                    <% } %>
+                                    <% const releaseDate = new Date(ep.release_date); %>
+                                    <% console.log(`Je m'appelle ${ep.name} et je suis sorti ${releaseDate}`);%>
+                                    <% if (releaseDate >= startDate && releaseDate <= endDate) { %>
+                                        <% if (ep.total_tracks> 1) { %>
+                                            <% const trackIds = ep.trackIds; 
+                                            console.log(`Voici les ids de l'ep ${ep.name} : ${trackIds}`);%>
+                                            <div class="album-preset">
+                                                <div class="album-preset-image">
+                                                    <img src="<%= ep.images[0].url %>" alt="<%= ep.name %>">
+                                                </div>
+                                                <div class="album-preset-info">
+                                                    <i class="menu-icon ion-md-home"></i>
+                                                    <span class="menu-name"><i class="material-icons recupDatasInsert" data-id="<%= ep.id %>" onclick="addAlbumToPlaylist('<%= ep.id %>')">playlist</i></span>
+
+                                                    <h2><%= ep.name %></h2> <h3><a href="/artist/<%= ep.artists[0].id %>"><%= ep.artists[0].name %></a></h3>   <h4><%= ep.release_date %></h4>
+                                                    <div class="tracks-section">
+                                                        <!-- Affichez les cinq premières pistes -->
+                                                        <ul class="track-list">
+                                                            <% ep.tracks.slice(0, 5).forEach(track=> { %>
+                                                                <li>
+                                                                    <a href="/track/<%= track.id %>"><%= track.name %></a>
+                                                                </li>
+                                                            <% }); %>
+                                                        </ul>
+            
+                                                        <% if (ep.total_tracks > 5) { %> <!-- Affichez le reste des pistes dans la div cachée -->
+                                                            <div class="hidden-tracks">
+                                                                <ul>
+                                                                    <% ep.tracks.slice(5).forEach(track=> { %>
+                                                                        <li>
+                                                                            <a href="/track/<%= track.id %>"><%= track.name %></a>
+                                                                        </li>
+                                                                    <% }); %>
+                                                                </ul>
+                                                            </div>
+            
+                                                            <!-- Ajoutez un bouton "Afficher plus" -->
+                                                            <div class="btn-center-div">
+                                                                <button class="show-more-button" onclick="toggleTracks(this)">
+                                                                    <div class="button-content">
+                                                                        <span>Afficher plus</span>
+                                                                        <i class="material-icons" id="arrow-icon">keyboard_arrow_down</i>
+                                                                    </div>
+                                                                </button>
+                                                            </div>
+                                                        <% } %>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                    <% } else {%>
+                                        <% } else {%>
+                                        <% } %>
                                     <% } %>
                                 <% }); %>
                             <% } %>
@@ -321,6 +337,14 @@
               height: 100%;
               backdrop-filter: blur(10px);
               pointer-events: none;
+            }
+
+            .recupDatasInsert{
+                padding-right: 3vw;
+            }
+
+            .album-preset-info .recupDatasInsert{
+                padding-right: 3vw;
             }
           </style>
 
@@ -405,125 +429,70 @@
                 }
             });
 
-            // const addTracksToPlaylist = async (accessToken, trackIds) => {
-            //     try {
-            //         // Effectuez une requête vers la route côté serveur pour vérifier l'existence de la playlist
-            //         const response = await fetch(`/check-playlist`);
-            //         const result = await response.json();
-            //         const playlistId = 0;
-
-            //         if (result.exists) {
-            //             // La playlist existe, vous pouvez ajouter la musique à la playlist ici
-            //             console.log('La playlist existe, ajoutez la musique à la playlist.');
-            //             // Ajoutez ici la logique pour ajouter la musique à la playlist existante
-
-            //             const playlistId = result.exists.id;
-            //             console.log(playlistId);
-            //         } else {
-            //             // La playlist n'existe pas, vous pouvez la créer et ajouter la musique
-            //             console.log('La playlist n\'existe pas, créez la playlist et ajoutez la musique.');
-                        
-            //             // Effectuez une nouvelle requête pour créer la playlist
-            //             const createPlaylistResponse = await fetch('/create-playlist', { 
-            //                 method: 'POST',
-            //                 headers: {
-            //                     'Content-Type': 'application/json',
-            //                 },
-            //                 body: JSON.stringify({ playlistId }),
-            //             });
-                        
-            //             const createPlaylistResult = await createPlaylistResponse.json();
-
-            //             if (createPlaylistResult.success) {
-            //                 console.log('Playlist créée avec succès. Ajoutez la musique à la playlist.');
-            //                 // Ajoutez ici la logique pour ajouter la musique à la playlist nouvellement créée
-            //             } else {
-            //                 console.error('Erreur lors de la création de la playlist :', createPlaylistResult.error);
-            //             }
-            //         }
-            //         // Ajoutez les pistes à la playlist
-            //         const addTracksResponse = await fetch('/add-tracks', {
-            //             method: 'POST',
-            //             headers: {
-            //                 'Content-Type': 'application/json',
-            //             },
-            //             body: JSON.stringify({ playlistId, trackIds }),
-            //         });
-            //         const addTracksResult = await addTracksResponse.json();
-
-            //         if (addTracksResult.success) {
-            //             console.log('Pistes ajoutées avec succès à la playlist');
-            //         } else {
-            //             console.error('Erreur lors de l\'ajout des pistes à la playlist:', addTracksResult.error);
-            //         }
-            //     } catch (error) {
-            //         console.error('Erreur lors de la vérification de l\'existence de la playlist :', error);
-            //     }
-            // };
-
             async function addAlbumToPlaylist(album_Id) {
-                    try {
-                        let playlistId = 0;
-                    // Effectuez une requête vers la route côté serveur pour vérifier l'existence de la playlist
-                        const response_check = await fetch(`/check-playlist`);
-                        const result_check = await response_check.json();
+                try {
+                    let playlistId = 0;
+                // Effectuez une requête vers la route côté serveur pour vérifier l'existence de la playlist
+                    const response_check = await fetch(`/check-playlist`);
+                    const result_check = await response_check.json();
 
-                        console.log(result_check);
+                    console.log(result_check);
 
-                        if (result_check.exists) {
-                            // La playlist existe, vous pouvez ajouter la musique à la playlist ici
-                            console.log('La playlist existe, ajoutez la musique à la playlist.');
-                            // Ajoutez ici la logique pour ajouter la musique à la playlist existante
+                    if (result_check.exists) {
+                        // La playlist existe, vous pouvez ajouter la musique à la playlist ici
+                        console.log('La playlist existe, ajoutez la musique à la playlist.');
+                        // Ajoutez ici la logique pour ajouter la musique à la playlist existante
 
-                            playlistId = result_check.exists.id;
-                            console.log(playlistId);
-                        } else {
-                            // La playlist n'existe pas, vous pouvez la créer et ajouter la musique
-                            console.log('La playlist n\'existe pas, créez la playlist et ajoutez la musique.');
+                        playlistId = result_check.exists.id;
+                        console.log(playlistId);
+                    } else {
+                        // La playlist n'existe pas, vous pouvez la créer et ajouter la musique
+                        console.log('La playlist n\'existe pas, créez la playlist et ajoutez la musique.');
 
-                            // Effectuez une nouvelle requête pour créer la playlist
-                            const createPlaylistResponse = await fetch('/create-playlist', {
-                                method: 'POST',
-                                headers: {
-                                'Content-Type': 'application/json',
-                                },
-                                body: JSON.stringify({ playlistId }),
-                            });
-
-                            const createPlaylistResult = await createPlaylistResponse.json();
-                            console.log(createPlaylistResult);
-                            playlistId = createPlaylistResult.playlist.id;
-
-                            if (createPlaylistResult.success) {
-                                
-                                console.log('Playlist créée avec succès. Ajoutez la musique à la playlist.');
-
-                            } else {
-                                console.error('Erreur lors de la création de la playlist :', createPlaylistResult.error);
-                            }
-                        }
-
-                        // Utilisez fetch pour appeler la nouvelle route sans recharger la page
-                        const response = await fetch('/add-album-to-playlist', {
+                        // Effectuez une nouvelle requête pour créer la playlist
+                        const createPlaylistResponse = await fetch('/create-playlist', {
                             method: 'POST',
                             headers: {
                             'Content-Type': 'application/json',
                             },
-                            body: JSON.stringify({
-                            albumId: album_Id,
-                            playlistId : playlistId, // Remplacez par l'ID de l'album que vous souhaitez ajouter
-                            }),
+                            body: JSON.stringify({ playlistId }),
                         });
 
-                        const result = await response.json();
-                    
-                    // Vous pouvez ajouter ici du code pour gérer la réponse si nécessaire
-                    } catch (error) {
-                    console.error('Erreur lors de l\'ajout de l\'album à la playlist : ', error);
-                    // Vous pouvez ajouter ici du code pour gérer les erreurs si nécessaire
+                        const createPlaylistResult = await createPlaylistResponse.json();
+                        console.log(createPlaylistResult);
+                        playlistId = createPlaylistResult.playlist.id;
+
+                        if (createPlaylistResult.success) {
+                            
+                            console.log('Playlist créée avec succès. Ajoutez la musique à la playlist.');
+
+                        } else {
+                            console.error('Erreur lors de la création de la playlist :', createPlaylistResult.error);
+                        }
                     }
+
+                    // Utilisez fetch pour appeler la nouvelle route sans recharger la page
+                    const response = await fetch('/add-album-to-playlist', {
+                        method: 'POST',
+                        headers: {
+                        'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                        albumId: album_Id,
+                        playlistId : playlistId, // Remplacez par l'ID de l'album que vous souhaitez ajouter
+                        }),
+                    });
+
+                    const result = await response.json();
+                
+                // Vous pouvez ajouter ici du code pour gérer la réponse si nécessaire
+                } catch (error) {
+                console.error('Erreur lors de l\'ajout de l\'album à la playlist : ', error);
+                // Vous pouvez ajouter ici du code pour gérer les erreurs si nécessaire
                 }
+            }
         </script>
+        
         
 
         <!-- Compiled and minified JavaScript -->

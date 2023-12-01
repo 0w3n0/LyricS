@@ -19,7 +19,7 @@
         <main>
             <div class="form__group field">
                 <input type="input" class="form__field" placeholder="Rechercher..." name="name" id='search-input' />
-                <label for="name" class="form__label">Rechercher...</label>
+                <label for="name" class="form__label" style="z-index: -1;">Rechercher...</label>            
             </div>
 
             <div>
@@ -116,8 +116,10 @@
                     const artistElement = document.createElement('div');
                     artistElement.classList.add('artist');
 
-                    const artistName = document.createElement('a');
-                    artistName.href = `/artist/${artist.id}`;
+                    const hrefname = document.createElement('a');
+                    hrefname.href = `/artist/${artist.id}`;
+
+                    const artistName = document.createElement('p');
                     artistName.classList.add('artist-name'); // Ajoutez cette classe si nécessaire
                     artistName.innerText = artist.name;
 
@@ -138,8 +140,9 @@
                         artistImage.appendChild(artistImageTag);
                     }
 
-                    artistElement.appendChild(artistImage);
-                    artistElement.appendChild(artistName);
+                    artistElement.appendChild(hrefname);
+                    hrefname.appendChild(artistImage);
+                    hrefname.appendChild(artistName);
 
 
                     artistsContainer.appendChild(artistElement);

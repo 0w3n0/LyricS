@@ -678,15 +678,15 @@ input[type=checkbox] {
   justify-content: center;
 }
 
-#singlecontainer .track {
+#singlecontainer .track, #single_t-i-d-radar {
   background-color: #98FB98;
 }
 
-#albumcontainer .album-preset {
+#albumcontainer .album-preset, #album_t-i-d-radar {
   background-color: #D8BFD8;
 }
 
-#epcontainer .album-preset {
+#epcontainer .album-preset, #ep_t-i-d-radar {
   background-color: #FFB6C1;
 }
 
@@ -733,4 +733,40 @@ input[type=checkbox] {
   text-align: center;
   font-size: 0.9rem;
   width: 23vw;
+}
+
+.following-main {
+  flex-wrap: wrap;
+  z-index: 1;
+  display: flex;
+}
+.following-main .artist-home {
+  position: relative;
+}
+.following-main .artist-home i.material-icons {
+  position: absolute;
+  top: 0;
+  left: 0;
+  font-size: 40px; /* Taille de l'icône */
+  color: rgb(255, 155, 155); /* Couleur de l'icône */
+}
+
+.h2-title {
+  margin: 0px 3vw 0px 3vw;
+}
+
+.button-container {
+  text-align: center;
+}
+
+.spotify-button {
+  border: 2px solid #4CAF50; /* Couleur verte */
+  border-radius: 28px;
+  padding: 10px 20px;
+  font-size: 16px;
+  background-color: #4CAF50; /* Couleur verte au survol */
+  cursor: pointer;
+}
+.spotify-button a {
+  color: white;
 }/*# sourceMappingURL=h.css.map */
