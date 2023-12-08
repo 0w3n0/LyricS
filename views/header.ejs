@@ -1,6 +1,19 @@
 <header class="header" id="header">
     <nav class="navbar container">
-        <a href="./index.html" class="brand">LyricS <%= displayName %></a><a href="/logout">Déconnexion</a>
+        <a href="/home" class="brand" id="logo_lyrics">
+            <img class="ppquipp" src="../images/logo_lyrics.webp" alt="">
+        </a>
+        <!-- <a href="/home" id="title">LYRICS</a> -->
+        <a href="#" class="brand">
+            <% if (pp.images[0].url.length> 0) { %>
+                <img class="ppquipp" src="<%= pp.images[0].url %>" alt="">
+            <% } else { %>
+                <img class="ppquipp" src="../images/user-defaut-pp.jpg" alt="">
+            <% } %>
+        </a>
+
+        
+        <!-- <a href="/logout">Déconnexion</a> -->
         <div class="menu" id="menu">
             <ul class="menu-list">
                 <li class="menu-item">
@@ -30,7 +43,7 @@
                 <li class="menu-item">
                     <a href="/following" class="menu-link">
                         <i class="menu-icon ion-md-search"></i>
-                        <span class="menu-name"><i class="material-icons">person</i></span>
+                        <span class="menu-name"><i class="material-icons">turned_in_not</i></span>
                     </a>
                 </li>
             </ul>
@@ -50,7 +63,7 @@
 
             let radarIconLocation = document.querySelector('.is-active');
             radarIconLocation.classList.remove('is-active');
-            
+
         }
 
         if (window.location.pathname === '/search') {
@@ -62,7 +75,7 @@
 
             let searchIconLocation = document.querySelector('.is-active');
             searchIconLocation.classList.remove('is-active');
-            
+
         }
 
         if (window.location.pathname === '/top-tracks') {
@@ -74,7 +87,7 @@
 
             let toptracksIconLocation = document.querySelector('.is-active');
             toptracksIconLocation.classList.remove('is-active');
-            
+
         }
 
         if (window.location.pathname === '/top-artists') {
@@ -86,7 +99,7 @@
 
             let topartistsIconLocation = document.querySelector('.is-active');
             topartistsIconLocation.classList.remove('is-active');
-            
+
         }
 
         if (window.location.pathname === '/top-menu') {
@@ -98,7 +111,7 @@
 
             let topmenuIconLocation = document.querySelector('.is-active');
             topmenuIconLocation.classList.remove('is-active');
-            
+
         }
 
         if (window.location.pathname === '/following') {
@@ -110,7 +123,28 @@
 
             let followingIconLocation = document.querySelector('.is-active');
             followingIconLocation.classList.remove('is-active');
-            
+
         }
     });
+
+    let prevScrollPos = window.scrollY;
+
+    window.onscroll = function () {
+        const currentScrollPos = window.scrollY;
+
+        if (currentScrollPos > 100) {
+            if (prevScrollPos > currentScrollPos) {
+                // L'utilisateur remonte, donc le header est visible
+                document.querySelector("header").style.top = "0";
+            } else {
+                // L'utilisateur descend, donc rétractez le header
+                document.querySelector("header").style.top = "-65px";
+            }
+        } else {
+            // Le défilement est inférieur à 100 pixels, donc le header est toujours visible
+            document.querySelector("header").style.top = "0";
+        }
+
+        prevScrollPos = currentScrollPos;
+    };
 </script>

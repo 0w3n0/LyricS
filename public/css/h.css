@@ -89,6 +89,7 @@ video {
   position: fixed;
   top: 0;
   left: 0;
+  transition: all 0.3s;
   width: 100%;
   height: auto;
   z-index: 100;
@@ -100,7 +101,20 @@ video {
   align-items: center;
   width: 100%;
   height: 4rem;
-  margin: 0 auto;
+  margin: 15px 0px 0px 0px;
+}
+
+header #logo_lyrics::after {
+  content: "LYRICS";
+  position: absolute;
+  top: 50%;
+  left: 33%;
+  transform: translate(-50%, -50%);
+  background-color: #000;
+  color: #fff;
+  padding: 5px 10px;
+  margin: 10px 10px 10px 0px;
+  border-radius: 5px;
 }
 
 .menu {
@@ -748,7 +762,12 @@ input[type=checkbox] {
   top: 0;
   left: 0;
   font-size: 40px; /* Taille de l'icône */
-  color: rgb(255, 155, 155); /* Couleur de l'icône */
+  color: white; /* Couleur de l'icône */
+}
+.following-main .artist-home .ish {
+  background: rgb(234, 133, 120);
+  border-radius: 50px;
+  padding: 4px;
 }
 
 .h2-title {
@@ -769,4 +788,9 @@ input[type=checkbox] {
 }
 .spotify-button a {
   color: white;
+}
+
+.ppquipp {
+  height: 60px;
+  border-radius: 50%;
 }/*# sourceMappingURL=h.css.map */
