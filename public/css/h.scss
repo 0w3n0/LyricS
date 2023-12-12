@@ -107,7 +107,7 @@ video {
 	margin: 15px 0px 0px 0px;
 }
 
-header #logo_lyrics::after{
+header .logo_lyrics::after{
 	content: "LYRICS";
     position: absolute;
     top: 50%;
@@ -118,6 +118,59 @@ header #logo_lyrics::after{
     padding: 5px 10px;
     margin: 10px 10px 10px 0px;
     border-radius: 5px;
+}
+
+header .user-menu .logo_lyrics::after{
+	content: "";
+    position: absolute;
+    top: 50%;
+    left: 33%;
+    transform: translate(-50%, -50%);
+    background-color: transparent;
+    color: #fff;
+    padding: 5px 10px;
+    margin: 10px 10px 10px 0px;
+    border-radius: 5px;
+}
+.ppquipp{
+	height: 60px;
+    border-radius: 50%;
+}
+
+.user-menu{
+    
+    height: 80vh;
+    width: 100vw;
+    border-top-left-radius: 30px;
+	border-top-right-radius: 30px;
+    margin: 0;
+    background-color: rgb(32, 30, 30);
+
+	.ppquipp{
+		height: 90px;
+	}
+
+	p{
+		font-size: 1.5rem;
+		color: whitesmoke;
+	}
+
+	a{
+		font-size: 1rem;
+		color: whitesmoke;
+	}
+	
+	.user-menu-header{
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		flex-direction: column;
+		height: 25vh;
+	}
+
+	ul{
+		text-align: center;
+	}
 }
 
 .menu {
@@ -842,7 +895,3 @@ input[type="checkbox"] {
 	}
 }
 
-.ppquipp{
-	height: 60px;
-    border-radius: 50%;
-}

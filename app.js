@@ -228,7 +228,7 @@ app.get('/search', async (req, res) => {
       try {
         const displayName = user.displayName;
 
-        const [ user_datas ] = await Promise.all([
+        const [user_datas] = await Promise.all([
           axios.get('https://api.spotify.com/v1/me', {
             headers: {
               'Authorization': `Bearer ${accessToken}`
@@ -264,17 +264,17 @@ app.get('/following', async (req, res) => {
     const user = req.user;
     const accessToken = user.accessToken;
     try {
-      const [ user_datas, artists_array ] = await Promise.all([
+      const [user_datas, artists_array] = await Promise.all([
         axios.get('https://api.spotify.com/v1/me', {
           headers: {
             'Authorization': `Bearer ${accessToken}`
           }
         }),
         axios.get('https://api.spotify.com/v1/me/following?type=artist&limit=50', {
-        headers: {
-          'Authorization': `Bearer ${accessToken}`
-        }
-      })
+          headers: {
+            'Authorization': `Bearer ${accessToken}`
+          }
+        })
       ]);
 
       const pp = user_datas.data;
@@ -363,8 +363,8 @@ app.get('/radar', async (req, res) => {
 
     if (req.user && req.user.accessToken) {
       try {
-        
-        const [ user_datas ] = await Promise.all([
+
+        const [user_datas] = await Promise.all([
           axios.get('https://api.spotify.com/v1/me', {
             headers: {
               'Authorization': `Bearer ${accessToken}`
@@ -838,7 +838,102 @@ app.get('/artist/:id', async (req, res) => {
   }
 });
 
+app.get('/blindtest', async (req, res) => {
+  if (req.isAuthenticated()) {
+    const user = req.user; // Accédez aux informations de l'utilisateur à partir de req.user
+    const accessToken = user.accessToken; // Exemple : Accédez à l'accessToken de l'utilisateur
+    if (req.user && req.user.accessToken) {
+      try {
+        const [playlistsData, user_datas] = await Promise.all([
+          axios.get('https://api.spotify.com/v1/me/playlists?limit=50', {
+            headers: {
+              'Authorization': `Bearer ${req.user.accessToken}`
+            }
+          }),
 
+          axios.get('https://api.spotify.com/v1/me', {
+            headers: {
+              'Authorization': `Bearer ${accessToken}`
+            }
+          })
+        ]);
+
+        const playlists = playlistsData.data.items;
+        const displayName = user.displayName;
+        const pp = user_datas.data;
+
+        // Sélectionnez une playlist au hasard
+        const randomPlaylist = playlists[Math.floor(Math.random() * playlists.length)];
+
+        // Obtenez l'ID de la playlist sélectionnée
+        const playlistId = '1L4rTXx7MNAuwvCzihm3ZH';
+        
+
+        // Définissez le nombre maximum de pistes à récupérer à chaque fois (par exemple, 50)
+        const limit = 50;
+
+        // Récupérez les pistes par lots jusqu'à ce que toutes les pistes soient récupérées
+        let offset = 0;
+        let allTracks = [];
+
+        // Déclarez tracksData à l'extérieur de la boucle
+        let tracksData;
+
+        let allTrackNames = [];
+
+        do {
+          const tracksData = await axios.get(`https://api.spotify.com/v1/playlists/${playlistId}/tracks`, {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
+            params: {
+              offset: offset,
+              limit: limit,
+            },
+          });
+
+          const tracks = tracksData.data.items;
+
+          // Si aucune piste n'est retournée, cela signifie que toutes les pistes ont été récupérées
+          if (tracks.length === 0) {
+            break;
+          }
+
+          // Ajoutez les pistes actuelles à la liste complète
+          allTracks = allTracks.concat(tracks);
+
+          // Stockez les noms des pistes dans le tableau
+
+          
+          allTrackNames.push(...tracks.map(track => track.track.name));
+
+          // Mettez à jour l'offset pour la prochaine itération
+          offset += limit;
+
+        } while (allTracks.length < 1000);
+
+        console.log(allTrackNames.length);
+
+        // Renvoyez la liste complète des pistes à la vue EJS
+        res.render('blindtest', { tracks: allTracks, pp, displayName });
+      } catch (error) {
+        console.error('Erreur lors de la récupération des données Spotify:', error);
+        res.status(500).send('Erreur lors de la récupération des données Spotify');
+      }
+    }
+
+    else {
+      console.log("Access Token:", req.user.accessToken, "<br/><br/><br/><br/><br/><br/><br/><br/>"); // Ajout de cette ligne
+
+      console.error("Erreur: Access Token non disponible");
+      res.status(401).send("Erreur: Accès non autorisé");
+    }
+  }
+  else {
+    res.redirect('/'); // Redirigez l'utilisateur vers l'authentification si ce n'est pas déjà fait
+  }
+}
+);
 
 
 

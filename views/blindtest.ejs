@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Top Tracks</title>
+    <!-- <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/home.css"> -->
+    <link rel="stylesheet" href="/css/h.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+
+</head>
+
+<body>
+    <%- include('header.ejs') %>
+
+        <main>
+            <!-- Incluez la bibliothèque Howler.js -->
+            <script src="https://unpkg.com/howler@2.2.3/dist/howler.min.js"></script>
+
+            <script>
+                const tracks = <%- JSON.stringify(tracks) %>;
+                const tracksWithPreview = tracks.filter(track => track.track.preview_url);
+                let shuffledTracks = shuffleArray([...tracksWithPreview]);
+
+
+
+                // Afficher le nombre de musiques avec preview_url
+                console.log(`Nombre de musiques avec preview_url : ${tracksWithPreview.length}`);
+
+                let currentIndex = 0;
+                let correctAnswers = 0;
+                let totalPoints = 0; // Ajout du compteur de points
+                let volume_range = 0.2; // Valeur initiale du volume
+
+                let answers = [];
+
+                function startBlindTest() {
+                    document.getElementById('btn-restart').style.display = 'none';
+                    document.getElementById('btn-start').style.display = 'none';
+                    document.querySelector(".main-div-blindtest").style.display = 'block';
+                    answers = [];
+                    playNextTrack();
+                }
+
+                function playNextTrack() {
+                    if (currentIndex < 5) {
+
+                        // Remettre à zéro l'interface utilisateur
+                        Howler.volume(volume_range);
+                        resetUI();
+                        document.getElementById('index').innerText = `${currentIndex + 1} / 5`;
+                        document.getElementById('answer').style.border = 'solid 3px white';
+
+                        const currentTrack = shuffledTracks[currentIndex];
+                        const previewUrl = currentTrack.track.preview_url;
+                        const trackName = currentTrack.track.name;
+
+                        const sound = new Howl({
+                            src: [previewUrl],
+                            format: ['mp3'],
+                            autoplay: false
+                        });
+
+                        let countdown = 30;
+
+                        // Démarrer la lecture audio
+                        sound.play();
+
+                        // Mettre à jour le compteur toutes les secondes
+                        const countdownInterval = setInterval(() => {
+                            document.getElementById('countdown').innerText = countdown;
+
+                            if (countdown === 0) {
+                                document.getElementById('countdown').innerText = '';
+                                // Afficher la cover après 30 secondes
+                                document.getElementById('cover').src = currentTrack.track.album.images[0].url;
+                                document.getElementById('answer').disabled = true;
+
+                                // Vérifier la réponse de l'utilisateur
+                                const userAnswer = document.getElementById('answer').value.toLowerCase();
+                                const isCorrect = userAnswer === trackName.toLowerCase();
+
+                                answers.push([trackName, isCorrect]);
+
+                                if (isCorrect) {
+                                    document.getElementById('answer').style.border = 'solid 3px green';
+                                    // document.getElementById('answer').innerText = 'Correct!';
+                                    correctAnswers++;
+                                    totalPoints++; // Incrémenter le compteur de points
+                                } else {
+                                    document.getElementById('answer').style.border = 'solid 3px red';
+                                    // document.getElementById('result').innerText = `Incorrect! Correct answer: ${trackName}`;
+                                }
+
+                                // Arrêter la lecture audio
+                                sound.stop();
+                                clearInterval(countdownInterval); // Arrêter le compteur
+
+                                // Passer à la piste suivante après 5 secondes
+                                setTimeout(() => {
+                                    currentIndex++;
+                                    playNextTrack();
+                                }, 8000);
+                            }
+
+                            countdown--;
+                        }, 1000); // Mettre à jour toutes les secondes
+                    } else {
+                        document.querySelector(".main-div-blindtest").style.display = 'none';
+                        showAnswers();
+                        document.getElementById('btn-restart').style.display = 'block';
+                        document.getElementById('btn-start').style.display = 'none';
+                    }
+                }
+
+                // Fonction pour mélanger un tableau (algorithme de Fisher-Yates)
+                function shuffleArray(array) {
+                    for (let i = array.length - 1; i > 0; i--) {
+                        const j = Math.floor(Math.random() * (i + 1));
+                        [array[i], array[j]] = [array[j], array[i]];
+                    }
+                    return array;
+                }
+
+                // Fonction pour réinitialiser l'interface utilisateur
+                function resetUI() {
+                    document.getElementById('cover').src = "./images/black.jpg";
+                    document.getElementById('answer').disabled = false;
+                    document.getElementById('result').innerText = '';
+                    document.getElementById('answer').value = '';
+                    document.getElementById('index').innerText = '';
+                    document.getElementById('suggestions').innerHTML = '';
+                }
+
+                // Ajoutez cela à votre script JavaScript
+                function handleInput() {
+                    const inputElement = document.getElementById('answer');
+                    const suggestionsDiv = document.getElementById('suggestions');
+                    const inputValue = inputElement.value.toLowerCase();
+
+                    // Effacer les anciennes suggestions
+                    suggestionsDiv.innerHTML = '';
+
+                    // Vérifier si l'input n'est pas vide
+                    if (inputValue.trim() !== '') {
+                        // Filtrer les cinq premières pistes dont le nom commence par la saisie de l'utilisateur
+                        const matchingTracks = tracks.filter(track => track.track.name.toLowerCase().startsWith(inputValue)).slice(0, 5);
+
+                        // Remplir le div avec les nouvelles suggestions
+                        matchingTracks.forEach(track => {
+                            const suggestion = document.createElement('div');
+                            suggestion.innerText = track.track.name;
+                            suggestion.classList.add('is-a-suggestion');
+                            suggestion.onclick = () => insertSelectedValue(track.track.name);
+                            suggestionsDiv.appendChild(suggestion);
+                        });
+                    }
+                }
+
+                // Ajoutez cela à votre script JavaScript
+                function insertSelectedValue(value) {
+                    const inputElement = document.getElementById('answer');
+                    inputElement.value = value;
+                }
+
+                function restartBlindTest() {
+                    // Réinitialiser les variables nécessaires
+                    currentIndex = 0;
+                    correctAnswers = 0;
+                    totalPoints = 0;
+
+                    // Mélanger à nouveau les pistes
+                    shuffledTracks = shuffleArray([...tracksWithPreview]);
+
+                    // Masquer le bouton de redémarrage et afficher le bouton de démarrage
+                    document.getElementById('btn-restart').style.display = 'none';
+                    document.getElementById('btn-start').style.display = 'none';
+
+                    // Afficher la section de blindtest
+                    document.querySelector(".main-div-blindtest").style.display = 'block';
+
+                    answers = [];
+
+                    // Lancer le blindtest
+                    playNextTrack();
+                }
+
+
+                function updateVolume() {
+                    const volumeSlider = document.getElementById('volumeSlider');
+                    volume_range = parseFloat(volumeSlider.value);
+                    Howler.volume(volume_range);
+                    console.log(Howler.volume(volume_range));
+                }
+
+                // Ajouter cela à la fin de votre script JavaScript
+                document.getElementById('volumeSlider').addEventListener('change', updateVolume);
+
+                function showAnswers() {
+                    // Créer une liste (<ul>) pour afficher les réponses
+                    const answersList = document.createElement('ul');
+                    answersList.style.borderRadius = '10px';
+                    answersList.style.border = '3px solid lightblue';
+
+                    // Remplir la liste avec les réponses
+                    answers.forEach((answer, index) => {
+                        const listItem = document.createElement('li');
+                        listItem.textContent = `${answer[0]}`;
+                        listItem.style.backgroundColor = answer[1] ? 'lightgreen' : 'lightpink';
+                        answersList.appendChild(listItem);
+                    });
+                    const nb_answers = document.createElement('h4');
+                    document.getElementById('result').innerText = `wow t'es goatesque !!! ${correctAnswers} / 5`;
+                    document.getElementById('result').appendChild(nb_answers);
+                    document.getElementById('result').appendChild(answersList);
+                }
+            </script>
+
+            <!-- <h4>/!\IMPORTANT ! TOUTES LES MUSIQUES NE SONT PAS DISPONIBLES À CAUSE DE SPOTIFY QUI N'AUTORISE PAS TOUS LES EXTRAITS PAR RAPPORT AUX DROITS D'AUTEURS ! /!\</h4> -->
+            <!-- HTML pour l'affichage -->
+
+            <style>
+                main {
+                    padding: 5rem 0px 5rem 0px;
+                    height: 100vh;
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: center;
+                }
+
+                #countdown {
+                    color: wheat;
+                    position: absolute;
+                    font-size: 3rem;
+                }
+
+                .main-div-blindtest {
+                    margin: 0px 0px 10vh 0px;
+                    display: none;
+                }
+
+                .img-ctdn {
+                    display: flex;
+                    justify-content: center;
+                    height: 30vh;
+                    align-items: center;
+                }
+
+                #answer {
+                    text-align: center;
+                    border: solid white 3px;
+                    border-radius: 1em;
+                    flex: 1;
+                    display: block;
+                    margin: 0 auto;
+                    min-width: 0;
+                    height: 15vw;
+                    width: 75vw;
+                    max-width: 600px;
+                    background: #ffffff80;
+                    outline: none;
+                    color: #000;
+                    font-size: 1rem;
+                }
+
+                .btn-blindtest {
+                    text-align: center;
+                    border: none;
+                    border-radius: 1em;
+                    flex: 1;
+                    display: block;
+                    margin: 0 auto;
+                    min-width: 0;
+                    height: 7vh;
+                    max-height: 7vh;
+                    width: 50vw;
+                    max-width: 600px;
+                    background: white;
+                    outline: none;
+                    color: #000;
+                    font-size: 1rem;
+                    box-shadow: rgba(100, 100, 111, 0.35) 0px 0px 29px 0px;
+                }
+
+                #btn-restart {
+                    display: none;
+                }
+
+                #suggestions {
+                    display: flex;
+                    width: 70vw;
+                    /* justify-content: center; */
+                    flex-direction: column;
+                    /* align-items: center; */
+                    padding: 0vh 5vw 0vh 5vw;
+                    background: ghostwhite;
+                    margin: 0 auto;
+                    border-bottom-left-radius: 19px;
+                    border-bottom-right-radius: 19px;
+                }
+
+                .is-a-suggestion {
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+
+                /*********** Baseline, reset styles ***********/
+                input[type="range"] {
+                    -webkit-appearance: none;
+                    appearance: none;
+                    background: transparent;
+                    cursor: pointer;
+                    width: 13rem;
+                }
+
+                /* Removes default focus */
+                input[type="range"]:focus {
+                    outline: none;
+                }
+
+                /******** Chrome, Safari, Opera and Edge Chromium styles ********/
+                /* slider track */
+                input[type="range"]::-webkit-slider-runnable-track {
+                    background-color: #b1ddec;
+                    border-radius: 0.5rem;
+                    height: 0.5rem;
+                }
+
+                /* slider thumb */
+                input[type="range"]::-webkit-slider-thumb {
+                    -webkit-appearance: none;
+                    /* Override default look */
+                    appearance: none;
+                    margin-top: -4px;
+                    /* Centers thumb on the track */
+                    background-color: #808080;
+                    border-radius: 0.5rem;
+                    height: 1rem;
+                    width: 1rem;
+                }
+
+                input[type="range"]:focus::-webkit-slider-thumb {
+                    outline: 3px solid #808080;
+                    outline-offset: 0.125rem;
+                }
+
+                /*********** Firefox styles ***********/
+                /* slider track */
+                input[type="range"]::-moz-range-track {
+                    background-color: #b1ddec;
+                    border-radius: 0.5rem;
+                    height: 0.5rem;
+                }
+
+                /* slider thumb */
+                input[type="range"]::-moz-range-thumb {
+                    background-color: #808080;
+                    border: none;
+                    /*Removes extra border that FF applies*/
+                    border-radius: 0.5rem;
+                    height: 1rem;
+                    width: 1rem;
+                }
+
+                input[type="range"]:focus::-moz-range-thumb {
+                    outline: 3px solid #808080;
+                    outline-offset: 0.125rem;
+                }
+
+                .range_blindtest {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                }
+
+                #index {
+                    display: flex;
+                    justify-content: center;
+                    margin-top: 5vh;
+                }
+
+                span .value {
+                    display: none;
+                    width: 0;
+                    height: 0;
+                }
+
+                #result{
+                    margin: 10vh 0vw 0vh 0vw;
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                }
+
+                #result ul{
+                    border-radius: 10px;
+                    border: 3px solid lightblue;
+                    width: 75vw;
+                    padding: 10px;
+                }
+                
+                #result li{
+                    background-color: lightgreen;
+                    border-radius: 10px;
+                    padding: 10px;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+            </style>
+
+            <div class="main-div-blindtest">
+
+                <div class="range_blindtest">
+                    <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="0.2"
+                        onchange="updateVolume()">
+                </div>
+
+                <h4 id="index"></h4>
+                <div class="img-ctdn">
+                    <p id="countdown">30</p>
+                    <img id="cover" src="./images/black.jpg" alt="Album Cover"
+                        style="width: 200px; height: 200px; border-radius: 10px;">
+                </div>
+
+                <div class="answ-div">
+                    <input type="text" id="answer" placeholder="Your answer" oninput="handleInput()">
+                    <div id="suggestions"></div>
+                </div>
+            </div>
+
+
+
+            <button id="btn-start" class="btn-blindtest" onclick="startBlindTest()">Commencer</button>
+            <button id="btn-restart" class="btn-blindtest" onclick="restartBlindTest()">Rejouer</button>
+
+            <div>
+                <div id="result"></div>
+            </div>
+
+            <div>
+                <p id="points"></p> <!-- Ajout de la div pour afficher les points -->
+            </div>
+        </main>
+        <!-- Compiled and minified JavaScript -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+
+</body>
+
+</html>
