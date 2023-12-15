@@ -1,14 +1,18 @@
 const express = require('express');
 const session = require('express-session');
+const cookieParser = require('cookie-parser');
 const passport = require('passport');
 const SpotifyStrategy = require('passport-spotify').Strategy;
 const axios = require('axios');
+const Browser = require('@capacitor/browser');
+const bodyParser = require('body-parser');
 
 
 const app = express();
 
 app.set('view engine', 'ejs');
 app.use(express.static('public'));
+app.use(cookieParser());
 
 app.use(express.json());
 
@@ -18,7 +22,7 @@ const clientId = 'd2dd99251bd9480b81222d8e8b26f6dd'; // LyricS
 const clientSecret = 'c6948141c6814b08826dc09eda752ef3';  // LyricS
 // const clientSecret = 'cb373d236ee7436aedddcfbabdd9d9e';  // LyricS BP
 
-const redirectUri = 'http://localhost:3000/auth/spotify/callback';
+const redirectUri = 'http://owen.vayland.fr/auth/spotify/callback';
 
 app.get('/', (req, res) => {
   res.render('home');
@@ -75,14 +79,14 @@ app.get('/auth/spotify/callback',
     if (!req.user) {
       return res.status(401).send('Erreur d\'authentification avec Spotify');
     }
-    res.redirect('/home');
+    res.redirect('/home?closewindow=true&spotify=' + JSON.stringify(req.user));
   }
 );
 
 app.get('/error', async (req, res) => {
-        res.render('error-page', {  });
-    });
-    
+  res.render('error-page', {});
+});
+
 app.get('/logout', function (req, res, next) {
   if (req.isAuthenticated()) {
     req.logout(function (err) {
@@ -98,26 +102,26 @@ app.get('/logout', function (req, res, next) {
 
 // Récupération des 10 titres les plus écoutés
 app.get('/top-tracks', async (req, res) => {
-  if (req.isAuthenticated()) {
-    const user = req.user; // Accédez aux informations de l'utilisateur à partir de req.user
+  if (req.isAuthenticated() || req.cookies.cookieSpotify) {
+    const user = req.user || JSON.parse(req.cookies.cookieSpotify); // Accédez aux informations de l'utilisateur à partir de req.user
     const accessToken = user.accessToken; // Exemple : Accédez à l'accessToken de l'utilisateur
-    if (req.user && req.user.accessToken) {
+    if (accessToken) {
       try {
         const [recentResponse, MidTermResponse, longTermResponse, user_datas] = await Promise.all([
           axios.get('https://api.spotify.com/v1/me/top/tracks?time_range=short_term', {
             headers: {
-              'Authorization': `Bearer ${req.user.accessToken}`
+              'Authorization': `Bearer ${accessToken}`
             }
           }),
           axios.get('https://api.spotify.com/v1/me/top/tracks?time_range=medium_term', {
             headers: {
-              'Authorization': `Bearer ${req.user.accessToken}`
+              'Authorization': `Bearer ${accessToken}`
             }
           }),
 
           axios.get('https://api.spotify.com/v1/me/top/tracks?time_range=long_term', {
             headers: {
-              'Authorization': `Bearer ${req.user.accessToken}`
+              'Authorization': `Bearer ${accessToken}`
             }
           }),
 
@@ -137,11 +141,12 @@ app.get('/top-tracks', async (req, res) => {
         res.render('topTracks', { recentTopTracks, MidTermTopTracks, longTermTopTracks, displayName, pp });
       } catch (error) {
         console.error('Erreur lors de la récupération des données Spotify:', error);
-        res.redirect('/error');      }
+        res.redirect('/error');
+      }
     }
 
     else {
-      console.log("Access Token:", req.user.accessToken, "<br/><br/><br/><br/><br/><br/><br/><br/>"); // Ajout de cette ligne
+      console.log("Access Token:", accessToken, "<br/><br/><br/><br/><br/><br/><br/><br/>"); // Ajout de cette ligne
 
       console.error("Erreur: Access Token non disponible");
       res.redirect('/error');
@@ -155,26 +160,26 @@ app.get('/top-tracks', async (req, res) => {
 
 // Récupération des 10 titres les plus écoutés
 app.get('/top-artists', async (req, res) => {
-  if (req.isAuthenticated()) {
-    const user = req.user; // Accédez aux informations de l'utilisateur à partir de req.user
+  if (req.isAuthenticated() || req.cookies.cookieSpotify) {
+    const user = req.user || JSON.parse(req.cookies.cookieSpotify); // Accédez aux informations de l'utilisateur à partir de req.user
     const accessToken = user.accessToken; // Exemple : Accédez à l'accessToken de l'utilisateur
-    if (req.user && req.user.accessToken) {
+    if (accessToken) {
       try {
         const [recentResponse, MidTermResponse, longTermResponse, user_datas] = await Promise.all([
           axios.get('https://api.spotify.com/v1/me/top/artists?time_range=short_term', {
             headers: {
-              'Authorization': `Bearer ${req.user.accessToken}`
+              'Authorization': `Bearer ${accessToken}`
             }
           }),
           axios.get('https://api.spotify.com/v1/me/top/artists?time_range=medium_term', {
             headers: {
-              'Authorization': `Bearer ${req.user.accessToken}`
+              'Authorization': `Bearer ${accessToken}`
             }
           }),
 
           axios.get('https://api.spotify.com/v1/me/top/artists?time_range=long_term', {
             headers: {
-              'Authorization': `Bearer ${req.user.accessToken}`
+              'Authorization': `Bearer ${accessToken}`
             }
           }),
 
@@ -207,11 +212,12 @@ app.get('/top-artists', async (req, res) => {
         res.render('topArtists', { recentTopArtists, MidTermTopArtists, longTermTopArtists, displayName, pp });
       } catch (error) {
         console.error('Erreur lors de la récupération des données Spotify:', error);
-        res.redirect('/error');      }
+        res.redirect('/error');
+      }
     }
 
     else {
-      console.log("Access Token:", req.user.accessToken, "<br/><br/><br/><br/><br/><br/><br/><br/>"); // Ajout de cette ligne
+      console.log("Access Token:", accessToken, "<br/><br/><br/><br/><br/><br/><br/><br/>"); // Ajout de cette ligne
 
       console.error("Erreur: Access Token non disponible");
       res.redirect('/error');
@@ -224,10 +230,10 @@ app.get('/top-artists', async (req, res) => {
 );
 
 app.get('/search', async (req, res) => {
-  if (req.isAuthenticated()) {
-    const user = req.user; // Accédez aux informations de l'utilisateur à partir de req.user
+  if (req.isAuthenticated() || req.cookies.cookieSpotify) {
+    const user = req.user || JSON.parse(req.cookies.cookieSpotify); // Accédez aux informations de l'utilisateur à partir de req.user
     const accessToken = user.accessToken; // Exemple : Accédez à l'accessToken de l'utilisateur
-    if (req.user && req.user.accessToken) {
+    if (accessToken) {
       try {
         const displayName = user.displayName;
 
@@ -245,11 +251,12 @@ app.get('/search', async (req, res) => {
         res.render('search', { displayName, pp, accessToken });
       } catch (error) {
         console.error('Erreur lors de la récupération des données Spotify:', error);
-        res.redirect('/error');      }
+        res.redirect('/error');
+      }
     }
 
     else {
-      console.log("Access Token:", req.user.accessToken, "<br/><br/><br/><br/><br/><br/><br/><br/>"); // Ajout de cette ligne
+      console.log("Access Token:", accessToken, "<br/><br/><br/><br/><br/><br/><br/><br/>"); // Ajout de cette ligne
 
       console.error("Erreur: Access Token non disponible");
       res.redirect('/error');
@@ -262,108 +269,121 @@ app.get('/search', async (req, res) => {
 );
 // Ajoutez ce point de terminaison pour récupérer les abonnements aux artistes
 app.get('/following', async (req, res) => {
-  if (req.isAuthenticated()) {
-    const user = req.user;
-    const accessToken = user.accessToken;
-    try {
-      const [user_datas, artists_array] = await Promise.all([
-        axios.get('https://api.spotify.com/v1/me', {
-          headers: {
-            'Authorization': `Bearer ${accessToken}`
-          }
-        }),
-        axios.get('https://api.spotify.com/v1/me/following?type=artist&limit=50', {
-          headers: {
-            'Authorization': `Bearer ${accessToken}`
-          }
-        })
-      ]);
+  if (req.isAuthenticated() || req.cookies.cookieSpotify) {
+    const user = req.user || JSON.parse(req.cookies.cookieSpotify); // Accédez aux informations de l'utilisateur à partir de req.user
+    const accessToken = user.accessToken; // Exemple : Accédez à l'accessToken de l'utilisateur
+    if (accessToken) {
+      try {
+        const [user_datas, artists_array] = await Promise.all([
+          axios.get('https://api.spotify.com/v1/me', {
+            headers: {
+              'Authorization': `Bearer ${accessToken}`
+            }
+          }),
+          axios.get('https://api.spotify.com/v1/me/following?type=artist&limit=50', {
+            headers: {
+              'Authorization': `Bearer ${accessToken}`
+            }
+          })
+        ]);
 
-      const pp = user_datas.data;
-      const artists = artists_array.data.artists.items;
+        const pp = user_datas.data;
+        const artists = artists_array.data.artists.items;
 
-      // Renvoyez la liste des artistes suivis à la vue
-      res.render('following', { artists, displayName: user.displayName, pp });
-    } catch (error) {
-      console.error('Erreur lors de la récupération des artistes suivis :', error.response?.data || error.message);
-      res.redirect('/error');
+        // Renvoyez la liste des artistes suivis à la vue
+        res.render('following', { artists, displayName: user.displayName, pp });
+      } catch (error) {
+        console.error('Erreur lors de la récupération des artistes suivis :', error.response?.data || error.message);
+        res.redirect('/error');
+      }
+    } else {
+      res.redirect('/');
     }
-  } else {
-    res.redirect('/');
   }
 });
 
 app.get('/check-following', async (req, res) => {
-  if (req.isAuthenticated()) {
-    const user = req.user;
-    const accessToken = user.accessToken;
-    try {
-      // Effectuez une requête vers l'API Spotify pour obtenir les artistes suivis
-      const response = await axios.get('https://api.spotify.com/v1/me/following?type=artist&limit=50', {
-        headers: {
-          'Authorization': `Bearer ${accessToken}`
-        }
-      });
+  if (req.isAuthenticated() || req.cookies.cookieSpotify) {
+    const user = req.user || JSON.parse(req.cookies.cookieSpotify); // Accédez aux informations de l'utilisateur à partir de req.user
+    const accessToken = user.accessToken; // Exemple : Accédez à l'accessToken de l'utilisateur
+    if (accessToken) {
+      try {
+        // Effectuez une requête vers l'API Spotify pour obtenir les artistes suivis
+        const response = await axios.get('https://api.spotify.com/v1/me/following?type=artist&limit=50', {
+          headers: {
+            'Authorization': `Bearer ${accessToken}`
+          }
+        });
 
-      const artists = response.data.artists.items;
+        const artists = response.data.artists.items;
 
-      res.json({ artists });
-    } catch (error) {
-      console.error('Erreur lors de la récupération des artistes suivis :', error.response?.data || error.message);
-      res.redirect('/error');
+        res.json({ artists });
+      } catch (error) {
+        console.error('Erreur lors de la récupération des artistes suivis :', error.response?.data || error.message);
+        res.redirect('/error');
+      }
+    } else {
+      res.redirect('/');
     }
-  } else {
-    res.redirect('/');
   }
 });
 
 app.post('/unfollow-artist', async (req, res) => {
-  try {
-    const { artistId } = req.body;
-    const accessToken = req.user.accessToken;
+  if (req.isAuthenticated() || req.cookies.cookieSpotify) {
+    const user = req.user || JSON.parse(req.cookies.cookieSpotify); // Accédez aux informations de l'utilisateur à partir de req.user
+    const accessToken = user.accessToken; // Exemple : Accédez à l'accessToken de l'utilisateur
+    if (accessToken) {
+      try {
+        const { artistId } = req.body;
 
-    // Effectuez une requête vers l'API Spotify pour se désabonner de l'artiste
-    await axios.delete(`https://api.spotify.com/v1/me/following?type=artist&ids=${artistId}`, {
-      headers: {
-        'Authorization': `Bearer ${accessToken}`
+        // Effectuez une requête vers l'API Spotify pour se désabonner de l'artiste
+        await axios.delete(`https://api.spotify.com/v1/me/following?type=artist&ids=${artistId}`, {
+          headers: {
+            'Authorization': `Bearer ${accessToken}`
+          }
+        });
+
+        // Répondez avec succès
+        res.json({ success: true });
+      } catch (error) {
+        console.error('Erreur lors du désabonnement de l\'artiste :', error.response?.data || error.message);
+        res.status(500).json({ success: false, error: 'Erreur lors du désabonnement de l\'artiste' });
       }
-    });
-
-    // Répondez avec succès
-    res.json({ success: true });
-  } catch (error) {
-    console.error('Erreur lors du désabonnement de l\'artiste :', error.response?.data || error.message);
-    res.status(500).json({ success: false, error: 'Erreur lors du désabonnement de l\'artiste' });
+    }
   }
 });
 
 app.post('/follow-artist', async (req, res) => {
-  try {
-    const { artistId } = req.body;
-    const accessToken = req.user.accessToken;
+  if (req.isAuthenticated() || req.cookies.cookieSpotify) {
+    const user = req.user || JSON.parse(req.cookies.cookieSpotify); // Accédez aux informations de l'utilisateur à partir de req.user
+    const accessToken = user.accessToken; // Exemple : Accédez à l'accessToken de l'utilisateur
+    if (accessToken) {
+      try {
+        const { artistId } = req.body;
 
-    // Effectuez une requête vers l'API Spotify pour s'abonner à l'artiste
-    await axios.put(`https://api.spotify.com/v1/me/following?type=artist&ids=${artistId}`, null, {
-      headers: {
-        'Authorization': `Bearer ${accessToken}`
+        // Effectuez une requête vers l'API Spotify pour s'abonner à l'artiste
+        await axios.put(`https://api.spotify.com/v1/me/following?type=artist&ids=${artistId}`, null, {
+          headers: {
+            'Authorization': `Bearer ${accessToken}`
+          }
+        });
+
+        // Répondez avec succès
+        res.json({ success: true });
+      } catch (error) {
+        console.error('Erreur lors de l\'abonnement à l\'artiste :', error.response?.data || error.message);
+        res.status(500).json({ success: false, error: 'Erreur lors de l\'abonnement à l\'artiste' });
       }
-    });
-
-    // Répondez avec succès
-    res.json({ success: true });
-  } catch (error) {
-    console.error('Erreur lors de l\'abonnement à l\'artiste :', error.response?.data || error.message);
-    res.status(500).json({ success: false, error: 'Erreur lors de l\'abonnement à l\'artiste' });
+    }
   }
 });
 
 // truc où les artistes sont 2 fois dedans et
 app.get('/radar', async (req, res) => {
-  if (req.isAuthenticated()) {
-    const user = req.user;
-    const accessToken = user.accessToken;
-
-    if (req.user && req.user.accessToken) {
+  if (req.isAuthenticated() || req.cookies.cookieSpotify) {
+    const user = req.user || JSON.parse(req.cookies.cookieSpotify); // Accédez aux informations de l'utilisateur à partir de req.user
+    const accessToken = user.accessToken; // Exemple : Accédez à l'accessToken de l'utilisateur
+    if (accessToken) {
       try {
 
         const [user_datas] = await Promise.all([
@@ -424,7 +444,8 @@ app.get('/radar', async (req, res) => {
         res.render('radarManager', { albumsByArtist, displayName: user.displayName, endDate, startDate, pp });
       } catch (error) {
         console.error('Erreur lors de la récupération des données Spotify:', error);
-        res.redirect('/error');      }
+        res.redirect('/error');
+      }
     } else {
       console.error("Erreur: Access Token non disponible");
       res.redirect('/error');
@@ -516,37 +537,41 @@ const getRecentReleasesForArtist = async (accessToken, artistId) => {
 // Ajoutez une route pour ajouter un album à la playlist
 app.post('/add-album-to-playlist', async (req, res) => {
 
-  const accessToken = req.user.accessToken;
+  if (req.isAuthenticated() || req.cookies.cookieSpotify) {
+    const user = req.user || JSON.parse(req.cookies.cookieSpotify); // Accédez aux informations de l'utilisateur à partir de req.user
+    const accessToken = user.accessToken; // Exemple : Accédez à l'accessToken de l'utilisateur
+    if (accessToken) {
+      try {
 
-  try {
-
-    const albumId = req.body.albumId;
-    const playlistId = req.body.playlistId;
+        const albumId = req.body.albumId;
+        const playlistId = req.body.playlistId;
 
 
-    // Obtenez les pistes de l'album
-    const albumTracks = await getAlbumTracks(albumId, accessToken);
+        // Obtenez les pistes de l'album
+        const albumTracks = await getAlbumTracks(albumId, accessToken);
 
-    // Obtenez les URI des pistes
-    const trackUris = albumTracks.map(track => track.uri);
+        // Obtenez les URI des pistes
+        const trackUris = albumTracks.map(track => track.uri);
 
-    // Ajoutez les pistes à la playlist en utilisant Axios
-    const addTracksToPlaylistResponse = await axios.post(
-      `https://api.spotify.com/v1/playlists/${playlistId}/tracks`,
-      { uris: trackUris },
-      {
-        headers: {
-          'Authorization': `Bearer ${accessToken}`,
-          'Content-Type': 'application/json',
-        },
+        // Ajoutez les pistes à la playlist en utilisant Axios
+        const addTracksToPlaylistResponse = await axios.post(
+          `https://api.spotify.com/v1/playlists/${playlistId}/tracks`,
+          { uris: trackUris },
+          {
+            headers: {
+              'Authorization': `Bearer ${accessToken}`,
+              'Content-Type': 'application/json',
+            },
+          }
+        );
+
+        console.log('Album ajouté à la playlist : ', addTracksToPlaylistResponse.data);
+        res.send('Album ajouté à la playlist!');
+      } catch (error) {
+        console.error('Erreur lors de l\'ajout de l\'album à la playlist : ', error);
+        res.status(500).send('Erreur lors de l\'ajout de l\'album à la playlist.');
       }
-    );
-
-    console.log('Album ajouté à la playlist : ', addTracksToPlaylistResponse.data);
-    res.send('Album ajouté à la playlist!');
-  } catch (error) {
-    console.error('Erreur lors de l\'ajout de l\'album à la playlist : ', error);
-    res.status(500).send('Erreur lors de l\'ajout de l\'album à la playlist.');
+    }
   }
 });
 
@@ -568,17 +593,23 @@ async function getAlbumTracks(albumId, accessToken) {
 }
 
 app.get('/check-playlist', async (req, res) => {
-  try {
-    const accessToken = req.user.accessToken;
+  if (req.isAuthenticated() || req.cookies.cookieSpotify) {
+    const user = req.user || JSON.parse(req.cookies.cookieSpotify); // Accédez aux informations de l'utilisateur à partir de req.user
+    const accessToken = user.accessToken; // Exemple : Accédez à l'accessToken de l'utilisateur
+    if (accessToken) {
+      try {
 
-    // Vérifiez l'existence de la playlist "LyricS Playlist"
-    const lyricSPlaylistExists = await checkLyricSPlaylist(accessToken);
 
-    // Répondez avec l'état d'existence de la playlist
-    res.json({ exists: lyricSPlaylistExists });
-  } catch (error) {
-    console.error('Erreur lors de la vérification de l\'existence de la playlist "LyricS Playlist" :', error);
-    res.status(500).json({ exists: false, error: 'Erreur lors de la vérification de l\'existence de la playlist "LyricS Playlist"' });
+        // Vérifiez l'existence de la playlist "LyricS Playlist"
+        const lyricSPlaylistExists = await checkLyricSPlaylist(accessToken);
+
+        // Répondez avec l'état d'existence de la playlist
+        res.json({ exists: lyricSPlaylistExists });
+      } catch (error) {
+        console.error('Erreur lors de la vérification de l\'existence de la playlist "LyricS Playlist" :', error);
+        res.status(500).json({ exists: false, error: 'Erreur lors de la vérification de l\'existence de la playlist "LyricS Playlist"' });
+      }
+    }
   }
 });
 
@@ -604,17 +635,22 @@ const checkLyricSPlaylist = async (accessToken) => {
 
 app.post('/create-playlist', async (req, res) => {
   console.log('Requête POST reçue pour la création de playlist');
-  try {
-    const accessToken = req.user.accessToken;
+  if (req.isAuthenticated() || req.cookies.cookieSpotify) {
+    const user = req.user || JSON.parse(req.cookies.cookieSpotify); // Accédez aux informations de l'utilisateur à partir de req.user
+    const accessToken = user.accessToken; // Exemple : Accédez à l'accessToken de l'utilisateur
+    if (accessToken) {
+      try {
 
-    // Créez la playlist "LyricS Playlist"
-    const createdPlaylist = await createLyricSPlaylist(accessToken);
+        // Créez la playlist "LyricS Playlist"
+        const createdPlaylist = await createLyricSPlaylist(accessToken);
 
-    // Répondez avec le résultat de la création de la playlist
-    res.json({ success: true, playlist: createdPlaylist });
-  } catch (error) {
-    console.error('Erreur lors de la création de la playlist "LyricS Playlist" :', error);
-    res.status(500).json({ success: false, error: 'Erreur lors de la création de la playlist "LyricS Playlist"', details: error.message });
+        // Répondez avec le résultat de la création de la playlist
+        res.json({ success: true, playlist: createdPlaylist });
+      } catch (error) {
+        console.error('Erreur lors de la création de la playlist "LyricS Playlist" :', error);
+        res.status(500).json({ success: false, error: 'Erreur lors de la création de la playlist "LyricS Playlist"', details: error.message });
+      }
+    }
   }
 });
 
@@ -657,22 +693,22 @@ const getUserId = async (accessToken) => {
 };
 
 app.get('/track/:id', async (req, res) => {
-  if (req.isAuthenticated()) {
-    const user = req.user; // Accédez aux informations de l'utilisateur à partir de req.user
+  if (req.isAuthenticated() || req.cookies.cookieSpotify) {
+    const user = req.user || JSON.parse(req.cookies.cookieSpotify); // Accédez aux informations de l'utilisateur à partir de req.user
     const accessToken = user.accessToken; // Exemple : Accédez à l'accessToken de l'utilisateur
-    const trackId = req.params.id; // Récupérez l'ID du morceau depuis les paramètres de l'URL
+    const trackId = req.params.id;
 
-    if (req.user && req.user.accessToken) {
+    if (accessToken) {
       try {
         const [trackDatas, recommendationsResponse, user_datas] = await Promise.all([
           axios.get(`https://api.spotify.com/v1/tracks/${trackId}`, {
             headers: {
-              'Authorization': `Bearer ${req.user.accessToken}`
+              'Authorization': `Bearer ${accessToken}`
             }
           }),
           axios.get(`https://api.spotify.com/v1/recommendations?seed_tracks=${trackId}`, {
             headers: {
-              'Authorization': `Bearer ${req.user.accessToken}`
+              'Authorization': `Bearer ${accessToken}`
             }
           }),
           axios.get('https://api.spotify.com/v1/me', {
@@ -717,13 +753,14 @@ app.get('/track/:id', async (req, res) => {
         } else {
           // Gérer d'autres types d'erreurs
           console.error('Erreur lors de la récupération des données Spotify:', error);
-          res.redirect('/error');        }
+          res.redirect('/error');
+        }
 
       }
     }
 
     else {
-      console.log("Access Token:", req.user.accessToken, "<br/><br/><br/><br/><br/><br/><br/><br/>"); // Ajout de cette ligne
+      console.log("Access Token:", accessToken, "<br/><br/><br/><br/><br/><br/><br/><br/>"); // Ajout de cette ligne
 
       console.error("Erreur: Access Token non disponible");
       res.redirect('/error');
@@ -736,21 +773,31 @@ app.get('/track/:id', async (req, res) => {
 
 // Récupération des 10 titres les plus écoutés
 app.get('/home', async (req, res) => {
-  if (req.isAuthenticated()) {
-    const user = req.user; // Accédez aux informations de l'utilisateur à partir de req.user
+  if (req.isAuthenticated() || req.cookies.cookieSpotify || req.query.token) {
+    let user = req.user; // Accédez aux informations de l'utilisateur à partir de req.user
+
+    if (req.query.token) {
+      res.cookie("cookieSpotify", req.query.token);
+      user = JSON.parse(req.query.token);
+    }
+
+    if (req.cookies.cookieSpotify) {
+      user = JSON.parse(req.cookies.cookieSpotify);
+    }
+
     const accessToken = user.accessToken; // Exemple : Accédez à l'accessToken de l'utilisateur
-    if (req.user && req.user.accessToken) {
+    if (accessToken) {
       try {
         const [Home_infos_artists, Home_infos_tracks, user_datas] = await Promise.all([
           axios.get('https://api.spotify.com/v1/me/top/artists?time_range=short_term&limit=5', {
             headers: {
-              'Authorization': `Bearer ${req.user.accessToken}`
+              'Authorization': `Bearer ${accessToken}`
             }
           }),
 
           axios.get('https://api.spotify.com/v1/me/top/tracks?time_range=short_term&limit=5', {
             headers: {
-              'Authorization': `Bearer ${req.user.accessToken}`
+              'Authorization': `Bearer ${accessToken}`
             }
           }),
 
@@ -769,11 +816,12 @@ app.get('/home', async (req, res) => {
         res.render('index', { Home_infos_artists_datas, Home_infos_tracks_datas, displayName, pp });
       } catch (error) {
         console.error('Erreur lors de la récupération des données Spotify:', error);
-        res.redirect('/error');      }
+        res.redirect('/error');
+      }
     }
 
     else {
-      console.log("Access Token:", req.user.accessToken, "<br/><br/><br/><br/><br/><br/><br/><br/>"); // Ajout de cette ligne
+      console.log("Access Token:", accessToken, "<br/><br/><br/><br/><br/><br/><br/><br/>"); // Ajout de cette ligne
 
       console.error("Erreur: Access Token non disponible");
       res.redirect('/error');
@@ -786,17 +834,17 @@ app.get('/home', async (req, res) => {
 );
 
 app.get('/artist/:id', async (req, res) => {
-  if (req.isAuthenticated()) {
-    const user = req.user;
-    const accessToken = user.accessToken;
+  if (req.isAuthenticated() || req.cookies.cookieSpotify) {
+    const user = req.user || JSON.parse(req.cookies.cookieSpotify); // Accédez aux informations de l'utilisateur à partir de req.user
+    const accessToken = user.accessToken; // Exemple : Accédez à l'accessToken de l'utilisateur
     const artistId = req.params.id;
 
-    if (req.user && req.user.accessToken) {
+    if (accessToken) {
       try {
         const [ArtistInfosResponse, ArtistrecommendationsResponse, ArtistTopTracksResponse, user_datas] = await Promise.all([
           axios.get(`https://api.spotify.com/v1/artists/${artistId}`, {
             headers: {
-              'Authorization': `Bearer ${req.user.accessToken}`
+              'Authorization': `Bearer ${accessToken}`
             }
           }),
           axios.get(`https://api.spotify.com/v1/artists/${artistId}/related-artists`, {
@@ -838,20 +886,20 @@ app.get('/artist/:id', async (req, res) => {
 });
 
 app.get('/blindtest', async (req, res) => {
-  if (req.isAuthenticated()) {
-    const user = req.user; // Accédez aux informations de l'utilisateur à partir de req.user
+  if (req.isAuthenticated() || req.cookies.cookieSpotify) {
+    const user = req.user || JSON.parse(req.cookies.cookieSpotify); // Accédez aux informations de l'utilisateur à partir de req.user
     const accessToken = user.accessToken; // Exemple : Accédez à l'accessToken de l'utilisateur
-    if (req.user && req.user.accessToken) {
+    if (accessToken) {
 
       const type = req.query.type;
       const id = req.query.id;
       const artistName = req.query.name;
-      
+
       try {
         const [user_datas] = await Promise.all([
           // axios.get('https://api.spotify.com/v1/me/playlists?limit=50', {
           //   headers: {
-          //     'Authorization': `Bearer ${req.user.accessToken}`
+          //     'Authorization': `Bearer ${accessToken}`
           //   }
           // }),
 
@@ -872,7 +920,7 @@ app.get('/blindtest', async (req, res) => {
         // Déclarez tracksData à l'extérieur de la boucle
         let tracksData;
         let allTrackNames = [];
-        
+
         if (type === 'playlist') {
           do {
             const tracksData = await axios.get(`https://api.spotify.com/v1/playlists/${id}/tracks`, {
@@ -1003,7 +1051,7 @@ app.get('/blindtest', async (req, res) => {
         // Obtenez l'ID de la playlist sélectionnée
         // const playlistId = '1L4rTXx7MNAuwvCzihm3ZH';
 
-        
+
 
         console.log(allTrackNames.length);
         console.log(allTrackNames);
@@ -1012,11 +1060,12 @@ app.get('/blindtest', async (req, res) => {
         res.render('blindtest', { tracks: allTracks, pp, displayName, accessToken, artistName });
       } catch (error) {
         console.error('Erreur lors de la récupération des données Spotify:', error);
-        res.redirect('/error');      }
+        res.redirect('/error');
+      }
     }
 
     else {
-      console.log("Access Token:", req.user.accessToken, "<br/><br/><br/><br/><br/><br/><br/><br/>"); // Ajout de cette ligne
+      console.log("Access Token:", accessToken, "<br/><br/><br/><br/><br/><br/><br/><br/>"); // Ajout de cette ligne
 
       console.error("Erreur: Access Token non disponible");
       res.redirect('/error');
@@ -1029,10 +1078,10 @@ app.get('/blindtest', async (req, res) => {
 );
 
 app.get('/blindtest-selector', async (req, res) => {
-  if (req.isAuthenticated()) {
-    const user = req.user; // Accédez aux informations de l'utilisateur à partir de req.user
+  if (req.isAuthenticated() || req.cookies.cookieSpotify) {
+    const user = req.user || JSON.parse(req.cookies.cookieSpotify); // Accédez aux informations de l'utilisateur à partir de req.user
     const accessToken = user.accessToken; // Exemple : Accédez à l'accessToken de l'utilisateur
-    if (req.user && req.user.accessToken) {
+    if (accessToken) {
 
       const type = req.query.type;
       const id = req.query.id;
@@ -1041,7 +1090,7 @@ app.get('/blindtest-selector', async (req, res) => {
         const [user_datas] = await Promise.all([
           // axios.get('https://api.spotify.com/v1/me/playlists?limit=50', {
           //   headers: {
-          //     'Authorization': `Bearer ${req.user.accessToken}`
+          //     'Authorization': `Bearer ${accessToken}`
           //   }
           // }),
 
@@ -1059,11 +1108,12 @@ app.get('/blindtest-selector', async (req, res) => {
         res.render('blindtest-selector', { pp, displayName, accessToken });
       } catch (error) {
         console.error('Erreur lors de la récupération des données Spotify:', error);
-        res.redirect('/error');      }
+        res.redirect('/error');
+      }
     }
 
     else {
-      console.log("Access Token:", req.user.accessToken, "<br/><br/><br/><br/><br/><br/><br/><br/>"); // Ajout de cette ligne
+      console.log("Access Token:", accessToken, "<br/><br/><br/><br/><br/><br/><br/><br/>"); // Ajout de cette ligne
 
       console.error("Erreur: Access Token non disponible");
       res.redirect('/error');

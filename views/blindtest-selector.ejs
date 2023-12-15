@@ -16,22 +16,123 @@
 <body>
 
     <%- include('header.ejs') %>
-        <main>
-            <div class="form__group field">
-                <input type="input" class="form__field" placeholder="Rechercher..." name="name" id='search-input' />
-                <label for="name" class="form__label" style="z-index: -1;">Rechercher...</label>            
+
+        <!-- <main>
+        <h4><a href="/blindtest?type=playlist&id=1L4rTXx7MNAuwvCzihm3ZH">Blindtest Playlist</a></h4>
+    <h4><a href="/blindtest?type=artist&id=41XEyClazvR6Ao77iD8qex">Blindtest Artist</a></h4>
+    <h4><a href="/blindtest?type=album&id=5ncfRnCt3xSTJMnoAgplCI">Blindtest Album</a></h4>
+    </main> -->
+        <div id="TDetails">
+
+            <!-- <h1>Détails de la musique</h1> -->
+            <!-- Affichez les détails de la musique ici -->
+
+            <div class="track-image-details">
+
+                <div class="firstelement-blindtest-manager">
+                    <h2 class="h2-title" style="color: black;">
+                        BLINDTEST
+                    </h2>
+                    <h4 style="width: 75vw;text-align: center; color: black;"> Amuse toi à tester tes connaissances sur
+                        tes albums, artistes ou playlists préférées !</h4>
+                </div>
+                <div class="form__group field" style="z-index: 1;">
+                    <input type="input" class="form__field" placeholder="Rechercher..." name="name" id='search-input' />
+                    <label for="name" class="form__label" style="z-index: -1;">Rechercher...</label>
+                </div>
             </div>
+            <style>
+                body {
+                    background-color: mistyrose;
+                }
+
+                #TDetails {
+                    position: relative;
+                    /* width: 500px;
+              height: 300px; */
+                    background: no-repeat center center;
+                    background-image: url('');
+                    background-size: cover;
+                    background-attachment: fixed;
+                    padding: 0;
+                }
+
+                /* #TDetails::after {
+                    content: "";
+                    position: absolute;
+                    width: 100%;
+                    height: 100%;
+                    backdrop-filter: blur(10px);
+                    pointer-events: none;
+                    top: 0;
+                } */
+
+                .button-container,
+                .tracks-container,
+                .recommended-artists,
+                h2 {
+                    z-index: 10;
+                    position: relative;
+                }
+
+                .track-image-details {
+                    background-color: mistyrose;
+                    justify-content: space-evenly;
+                }
+
+                .track-image-details .firstelement-blindtest-manager h2 {
+                    color: whitesmoke;
+                    z-index: 1;
+                    font-size: 2rem;
+                }
+
+                .track-image-details .firstelement-blindtest-manager h4 {
+                    color: whitesmoke;
+                    text-transform: uppercase;
+                    z-index: 1;
+                    font-size: 0.75rem;
+                }
+
+                .firstelement-blindtest-manager {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    height: 15vh;
+                    justify-content: space-between;
+                }
+
+                .h2-title {
+                    color: white;
+                }
+
+                .artist-home {
+                    background: rgba(222, 245, 229);
+                }
+
+                .artist {
+                    background: rgb(249 86 86);
+                }
+            </style>
+
+
+        </div>
+
+        <main>
 
             <div>
                 <div id="results-artists-container" class="artists-container"></div>
 
                 <div id="results-albums-container" class="artists-container"></div>
 
-                <div id="results-container" class="tracks-container"></div>
+                <div id="results-playlists-container" class="artists-container"></div>
             </div>
         </main>
 
         <style>
+            main {
+                padding: 5rem 0px 5rem 0px;
+            }
+
             .titleSection {
                 margin-bottom: 1vh;
             }
@@ -50,7 +151,7 @@
 
             // Fonction pour effectuer la recherche Spotify
             function searchSpotify(query) {
-                const apiUrl = `https://api.spotify.com/v1/search?q=${query}&type=track,artist,album&limit=10&market=FR`;
+                const apiUrl = `https://api.spotify.com/v1/search?q=${query}&type=artist,album,playlist&limit=10&market=FR`;
 
                 fetch(apiUrl, {
                     method: 'GET',
@@ -60,6 +161,7 @@
                 })
                     .then(response => response.json())
                     .then(data => {
+                        console.log(data);
                         // Traitez les données de réponse et mettez à jour l'interface utilisateur
                         displaySearchResults(data);
                     })
@@ -68,29 +170,30 @@
 
             // Fonction pour afficher les résultats de la recherche
             function displaySearchResults(data) {
-                const resultsContainer = document.querySelector('#results-container');
+                const playlistsContainer = document.querySelector('#results-playlists-container');
                 const artistsContainer = document.querySelector('#results-artists-container');
                 const albumsContainer = document.querySelector('#results-albums-container');
-                resultsContainer.innerHTML = '';
+
+                playlistsContainer.innerHTML = '';
                 artistsContainer.innerHTML = '';
                 albumsContainer.innerHTML = '';
 
-                const titleSectionResult = document.createElement('h4');
+                const titleSectionPlaylist = document.createElement('h4');
                 const titleSectionArtist = document.createElement('h4');
                 const titleSectionAlbum = document.createElement('h4');
 
                 // Créez un nouvel élément span
                 var spanElement = document.createElement('span');
-                spanElement.style.color = "mistyrose";
+                spanElement.style.color = "#BCEAD5";
                 // Définissez le contenu du span
-                spanElement.textContent = 'Musiques...';
+                spanElement.textContent = 'Playlists...';
                 // Ajoutez le span à l'élément titleSectionArtist
-                titleSectionResult.appendChild(document.createTextNode('Résultats pour ')); // Ajoutez le texte "Résultats pour "
-                titleSectionResult.appendChild(spanElement);
+                titleSectionPlaylist.appendChild(document.createTextNode('Résultats pour ')); // Ajoutez le texte "Résultats pour "
+                titleSectionPlaylist.appendChild(spanElement);
                 
                 // Créez un nouvel élément span
                 var spanElement = document.createElement('span');
-                spanElement.style.color = "mistyrose";
+                spanElement.style.color = "#BCEAD5";
                 // Définissez le contenu du span
                 spanElement.textContent = 'Artistes...';
                 // Ajoutez le span à l'élément titleSectionArtist
@@ -99,64 +202,56 @@
 
                 // Créez un nouvel élément span
                 var spanElement = document.createElement('span');
-                spanElement.style.color = "mistyrose";
+                spanElement.style.color = "#BCEAD5";
                 // Définissez le contenu du span
                 spanElement.textContent = 'Albums...';
                 // Ajoutez le span à l'élément titleSectionArtist
                 titleSectionAlbum.appendChild(document.createTextNode('Résultats pour ')); // Ajoutez le texte "Résultats pour "
                 titleSectionAlbum.appendChild(spanElement);
                 
-                resultsContainer.appendChild(titleSectionResult);
+                playlistsContainer.appendChild(titleSectionPlaylist);
                 artistsContainer.appendChild(titleSectionArtist);
                 albumsContainer.appendChild(titleSectionAlbum);
 
-                titleSectionResult.classList.add('titleSection');
+                titleSectionPlaylist.classList.add('titleSection');
                 titleSectionArtist.classList.add('titleSection');
                 titleSectionAlbum.classList.add('titleSection');
+                const playlists = data.playlists.items;
 
-                const tracks = data.tracks.items;
+                playlists.forEach(artist => {
+                    const artistElement = document.createElement('div');
+                    artistElement.classList.add('artist');
 
-                tracks.forEach(track => {
-                    const trackElement = document.createElement('div');
-                    trackElement.classList.add('track');
+                    const hrefname = document.createElement('a');
+                    hrefname.href = `/blindtest?type=playlist&id=${artist.id}&name="${artist.name}"`;
 
-                    const trackImage = document.createElement('div');
-                    trackImage.classList.add('track-image');
-                    const trackImageTag = document.createElement('img');
-                    trackImageTag.src = track.album.images[0].url;
-                    trackImageTag.alt = track.name;
-                    trackImage.appendChild(trackImageTag);
+                    const artistName = document.createElement('p');
+                    artistName.classList.add('artist-name'); // Ajoutez cette classe si nécessaire
+                    artistName.innerText = artist.name;
 
-                    const trackInfo = document.createElement('div');
-                    trackInfo.classList.add('track-info');
+                    const artistImage = document.createElement('div');
+                    artistImage.classList.add('artist-image');
+                    // Vérifier si la piste a des images
+                    if (artist.images.length > 0) {
+                        const artistImageTag = document.createElement('img');
+                        artistImageTag.src = artist.images[0].url;
+                        artistImageTag.alt = artist.name;
+                        artistImage.appendChild(artistImageTag);
+                    }
 
-                    const trackNameLink = document.createElement('a');
-                    trackNameLink.href = `/track/${track.id}`;
-                    const trackName = document.createElement('h2');
-                    trackName.innerText = track.name;
-                    trackNameLink.appendChild(trackName);
+                    else {
+                        const artistImageTag = document.createElement('img');
+                        artistImageTag.src = "../images/user-defaut-pp.jpg";
+                        artistImageTag.alt = artist.name;
+                        artistImage.appendChild(artistImageTag);
+                    }
 
-                    const trackArtists = document.createElement('p');
-                    const artistsList = track.artists.map(artist => `<a href="/artist/${artist.id}">${artist.name}</a>`);
-                    trackArtists.innerHTML = artistsList.join(', ');
+                    artistElement.appendChild(hrefname);
+                    hrefname.appendChild(artistImage);
+                    hrefname.appendChild(artistName);
 
-                    trackInfo.appendChild(trackNameLink);
-                    trackInfo.appendChild(trackArtists);
 
-                    const trackDuration = document.createElement('div');
-                    trackDuration.classList.add('track-duration');
-
-                    const durationMs = track.duration_ms;
-                    const durationSeconds = Math.floor(durationMs / 1000);
-                    const minutes = Math.floor(durationSeconds / 60);
-                    const seconds = durationSeconds % 60;
-                    trackDuration.innerText = `${minutes}:${seconds.toString().padStart(2, '0')}`;
-
-                    trackElement.appendChild(trackImage);
-                    trackElement.appendChild(trackInfo);
-                    trackElement.appendChild(trackDuration);
-
-                    resultsContainer.appendChild(trackElement);
+                    playlistsContainer.appendChild(artistElement);
                 });
 
                 const artists = data.artists.items;
@@ -166,7 +261,7 @@
                     artistElement.classList.add('artist');
 
                     const hrefname = document.createElement('a');
-                    hrefname.href = `/artist/${artist.id}`;
+                    hrefname.href = `/blindtest?type=artist&id=${artist.id}&name="${artist.name}"`;
 
                     const artistName = document.createElement('p');
                     artistName.classList.add('artist-name'); // Ajoutez cette classe si nécessaire
@@ -204,7 +299,7 @@
                     albumElement.classList.add('artist');
 
                     const hrefname = document.createElement('a');
-                    hrefname.href = `/album/${album.id}`;
+                    hrefname.href = `/blindtest?type=album&id=${album.id}&name="${album.name}"`;
 
                     const albumName = document.createElement('p');
                     albumName.classList.add('artist-name'); // Ajoutez cette classe si nécessaire

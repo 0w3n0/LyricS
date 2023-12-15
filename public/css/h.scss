@@ -33,6 +33,28 @@
 	text-rendering: optimizeLegibility;
 }
 
+
+@font-face {
+    font-family: 'karmatic_arcaderegular';
+    src: url('./fonts/ka1-webfont.woff2') format('woff2'),
+         url('./fonts/ka1-webfont.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+
+}
+
+
+
+
+@font-face {
+    font-family: 'rieslingregular';
+    src: url('./fonts/riesling-webfont.woff2') format('woff2'),
+         url('./fonts/riesling-webfont.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+
+}
+
 html {
 	font-size: 100%;
 	box-sizing: inherit;
@@ -111,7 +133,7 @@ header .logo_lyrics::after{
 	content: "LYRICS";
     position: absolute;
     top: 50%;
-    left: 33%;
+    left: 140px;
     transform: translate(-50%, -50%);
     background-color: #000;
     color: #fff;
