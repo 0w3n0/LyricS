@@ -40,8 +40,10 @@
                       </p>
                       <% } else { %>
                         <p>
-                          <%= trackDatasInfos.artists[0].name %> <br />
-                            <%= trackDatasInfos.album.name %>
+                          <%= trackDatasInfos.artists[0].name %>
+                        </p>
+                        <p>
+                          <%= trackDatasInfos.album.name %>
                         </p>
                         <% } %>
                           <!-- <p><% trackDatasInfos.artists.forEach(artist=> { %> <%= artist.name %> 
@@ -84,6 +86,24 @@
         .h2-title {
           color: white;
         }
+
+        .track-image-details p {
+          color: whitesmoke;
+          z-index: 1;
+          font-size: 1rem;
+          text-shadow: -2px -2px 2px #000, 2px -2px 2px #000, -2px 2px 2px #000, 2px 2px 2px #000;
+        }
+
+        .track-image-details h2 {
+          z-index: 1;
+          font-size: 1.25rem;
+
+        }
+
+        .h2-title {
+          margin: 0px 3vw 0px 3vw;
+          text-shadow: -2px -2px 2px #000, 2px -2px 2px #000, -2px 2px 2px #000, 2px 2px 2px #000;
+        }
       </style>
 
       <div class="track-infos-datas">
@@ -95,10 +115,10 @@
         </p>
 
         <!-- Ajoutez un lien vers la musique sur Spotify -->
-      <div class="button-container">
-        <button class="spotify-button"><a href="<%= trackDatasInfos.external_urls.spotify %>">Écouter sur
-            Spotify</a></button>
-      </div>
+        <div class="button-container">
+          <button class="spotify-button"><a href="<%= trackDatasInfos.external_urls.spotify %>">Écouter sur
+              Spotify</a></button>
+        </div>
 
         <!-- Ajoutez d'autres statistiques ici -->
       </div>

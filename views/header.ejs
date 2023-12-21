@@ -7,13 +7,14 @@
         <a href="#" class="brand">
             <% if (pp.images[0]) { %>
                 <img class="ppquipp" id="touch-user" src="<%= pp.images[0].url %>" alt="" onclick="openMenu()">
-            <% } else { %>
-                <img class="ppquipp" id="touch-user" src="../images/user-defaut-pp.jpg" alt="" onclick="openMenu()">
-            <% } %>
+                <% } else { %>
+                    <img class="ppquipp" id="touch-user" src="../images/user-defaut-pp.jpg" alt="" onclick="openMenu()">
+                    <% } %>
         </a>
 
-        <div id="content-container" style="position: fixed; inset: 0; padding-top: 100vh; overflow-y: hidden; pointer-events: none; z-index: 1">
-            <div class="user-menu">
+        <div id="content-container"
+            style="position: fixed; inset: 0; padding-top: 100vh; overflow-y: hidden; pointer-events: none; z-index: 1">
+            <div class="user-menu" style="position: relative;">
                 <div class="user-menu-header">
                     <a href="#" class="brand">
                         <% if (pp.images[0]) { %>
@@ -30,9 +31,37 @@
                     </p>
                 </div>
 
-                <ul>
-                    <li><a href="">Consulter mon profil</a></li>
-                    <li><a href="/logout">Deconnexion</a></li>
+                <ul style="    display: flex;
+                flex-direction: column;
+                justify-content: space-evenly;
+                height: 20vh;">
+                    <li><a href="<%= pp.external_urls.spotify %>">Consulter mon profil</a></li>
+
+                    <li><a href="/lyrics-playlist">Consulter ma playlist LyricS</a></li>
+
+                    <li><a href="/logout" style="
+                        position: absolute;
+                        bottom: 5vh;
+                        left: 35%;
+                        background: #ff6969;
+                        border-radius: 10px;
+                        padding: 10px;
+                        color: black;" 
+                        onclick="logout()">Deconnexion</a></li>
+                    <style>
+                        #playlist-container {
+                            display: flex;
+                            flex-direction: column;
+                            margin: 10px;
+                        }
+
+                        .song {
+                            margin: 5px;
+                            padding: 10px;
+                            border: 1px solid #ddd;
+                            cursor: move;
+                        }
+                    </style>
                 </ul>
             </div>
 
@@ -48,12 +77,12 @@
                         <span class="menu-name"><i class="material-icons">home</i></span>
                     </a>
                 </li>
-                <li class="menu-item">
+                <!-- <li class="menu-item">
                     <a href="/top-tracks" class="menu-link">
                         <i class="menu-icon ion-md-home"></i>
                         <span class="menu-name"><i class="material-icons">portrait</i></span>
                     </a>
-                </li>
+                </li> -->
                 <li class="menu-item">
                     <a href="/search" class="menu-link">
                         <i class="menu-icon ion-md-search"></i>
@@ -75,7 +104,7 @@
                 <li class="menu-item">
                     <a href="/blindtest-selector" class="menu-link">
                         <i class="menu-icon ion-md-search"></i>
-                        <span class="menu-name"><i class="material-icons">turned_in</i></span>
+                        <span class="menu-name"><i class="material-icons">audiotrack</i></span>
                     </a>
                 </li>
             </ul>
@@ -182,23 +211,6 @@
         prevScrollPos = currentScrollPos;
     };
 
-
-    // const open_menu = document.getElementById("touch-user");
-    // const menu = document.querySelector(".user-menu");
-
-    // open_menu.addEventListener('click', () => {
-    //     // Augmenter progressivement la valeur de bottom de -800px à 0
-    //     let bottomValue = -800;
-    //     const interval = setInterval(() => {
-    //         menu.style.bottom = `${bottomValue}px`;
-    //         bottomValue += 50; // Vous pouvez ajuster le pas d'incrémentation
-    //         if (bottomValue >= 0) {
-    //             menu.style.bottom = '0';
-    //             clearInterval(interval);
-    //         }
-    //     }, 10); // Vous pouvez ajuster l'intervalle de temps
-    // });
-
     let toggleMenu = false;
 
     var openMenu = function () {
@@ -208,7 +220,7 @@
             $("#content-container").animate({ scrollTop: window.innerHeight }, 100, function () {
                 toggleMenu = true;
             });
-            $("body").css({"overflow-y":"hidden"});
+            $("body").css({ "overflow-y": "hidden" });
         }
         else {
             closeMenu();
@@ -220,7 +232,7 @@
         $("#content-container").animate({ scrollTop: 0 }, 100, function () {
             toggleMenu = false;
         });
-        $("body").css({"overflow-y":"auto"});
+        $("body").css({ "overflow-y": "auto" });
     }
 
     $("#content-container").on("scroll", function () {

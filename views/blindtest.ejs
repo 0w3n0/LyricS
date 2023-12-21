@@ -17,7 +17,7 @@
     <%- include('header.ejs') %>
 
         <main>
-            <h3 id="name_bt"><span>Blindtest</span> <span style="color: mistyrose;">
+            <h3 id="name_bt"><span>Blindtest </span> <span style="color: lightblue;">
                 <%= artistName %>
             </span></h3>
 
@@ -48,7 +48,11 @@
                 </div>
             </div>
             
-            <div>
+            <div id="params-bt" style="width: 100vw;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;">
 
                 <label id="song-count-label" for="song-count">Nombre de chansons (1 à X): </label>
                 <input type="range" id="song-count" name="songCount" min="1" max="" value="5">
@@ -63,6 +67,10 @@
                 <label for="suggestions">Afficher les suggestions? </label>
                 <input type="checkbox" id="suggestionss" name="enableSuggestions" checked>
                 <br>
+                <h5 style="font-size: 10px;
+                text-align: center;
+                padding: 0 10vw 50px;">IMPORTANT ! TOUTES LES MUSIQUES NE SONT PAS DISPONIBLES À CAUSE DE SPOTIFY QUI N'AUTORISE PAS TOUS LES EXTRAITS PAR RAPPORT AUX DROITS D'AUTEURS ! </h5>
+
             </div>
 
             <button id="btn-start" class="btn-blindtest" onclick="startBlindTest()">Commencer</button>
@@ -158,6 +166,7 @@
 
                         document.getElementById('btn-restart').style.display = 'none';
                         document.getElementById('btn-start').style.display = 'none';
+                        document.getElementById('params-bt').style.display = 'none';
                         document.querySelector(".main-div-blindtest").style.display = 'block';
                         answers = [];
                         playNextTrack(songCount, timeLimit, enableSuggestions);
@@ -362,25 +371,7 @@
                     }
 
                     function restartBlindTest() {
-                        // Réinitialiser les variables nécessaires
-                        currentIndex = 0;
-                        correctAnswers = 0;
-                        totalPoints = 0;
-
-                        // Mélanger à nouveau les pistes
-                        shuffledTracks = shuffleArray([...tracksWithPreview]);
-
-                        // Masquer le bouton de redémarrage et afficher le bouton de démarrage
-                        document.getElementById('btn-restart').style.display = 'none';
-                        document.getElementById('btn-start').style.display = 'none';
-
-                        // Afficher la section de blindtest
-                        document.querySelector(".main-div-blindtest").style.display = 'block';
-
-                        answers = [];
-
-                        // Lancer le blindtest
-                        playNextTrack();
+                        location.reload();
                     }
 
 
@@ -409,7 +400,21 @@
                             answersList.appendChild(listItem);
                         });
                         const nb_answers = document.createElement('h4');
-                        nb_answers.innerText = `wow t'es goatesque !!!`;
+
+                        console.log(correctAnswers, songCount);
+                        
+                        if (correctAnswers == songCount) {
+                            nb_answers.innerText = `T'es le GOAT :)`;
+                        }
+                        
+                        else if (correctAnswers >= songCount / 2) {
+                            nb_answers.innerText = `Pas mal, continue :D`;
+                        }
+                        
+                        else {
+                            nb_answers.innerText = `Retente ta chance D:`;
+                        }
+                        
                         document.getElementById('result').appendChild(pseudo_after);
                         document.getElementById('result').appendChild(nb_answers);
                         document.getElementById('result').appendChild(answersList);
@@ -417,7 +422,6 @@
           
             </script>
 
-            <!-- <h4>/!\IMPORTANT ! TOUTES LES MUSIQUES NE SONT PAS DISPONIBLES À CAUSE DE SPOTIFY QUI N'AUTORISE PAS TOUS LES EXTRAITS PAR RAPPORT AUX DROITS D'AUTEURS ! /!\</h4> -->
             <!-- HTML pour l'affichage -->
 
             <style>
@@ -635,11 +639,13 @@
                     /* height: 100%; */
                     background-color: mistyrose;
                     /* transform: rotate(45deg); */
-                    font-family: "rieslingregular";
+                    font-family: Poppins;
                     font-size: 4rem;
                     display: flex;
                     justify-content: center;
                     padding: 0vh 4vw 0vh 4vw;
+                    border: outset 12px;
+                    border-radius: 13px;
                     font-weight: bold;
                     margin: 0vh 0vw 5vh 0vw;
                     /* text-shadow: 0px 0px 8px #000000; */
@@ -651,9 +657,9 @@
                     border: 3px solid lightgreen;
                     border-radius: 40px;
                     display: flex;
-                    height: 6vh;
+                    height: 50px;
                     justify-content: center;
-                    margin: 2vh auto;
+                    margin: 30px auto;
                     align-items: center;
                 }
 
@@ -668,6 +674,10 @@
                 #suggestionss{
                     opacity: 100%;
                     pointer-events: all;
+                }
+
+                html{
+                    background-color: lavender;
                 }
             </style>
         <!-- Compiled and minified JavaScript -->

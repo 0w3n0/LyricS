@@ -24,9 +24,18 @@
                 <h2 class="h2-title">
                     <%= ArtistInfos.name %>
                 </h2>
-
+                <!-- 
                 <i class="material-icons subscribe-icon artist_datas" data-artist-id="<%= ArtistInfos.id %>"
-                    style="z-index: 10; color: white;">library_add</i>
+                    style="z-index: 10; color: white;">library_add</i> -->
+
+                <button class="btn-add-playlist-single artist_datas" data-artist-id="<%= ArtistInfos.id %>">
+                    <span class="menu-name" style="width: 16px;">
+                        <i class="material-icons subscribe-icon" style="
+                            display: flex;
+                            justify-content: flex-end;
+                            padding-left: 20px;
+                        ">close</i></span>
+                </button>
             </div>
             <style>
                 #TDetails {
@@ -49,27 +58,64 @@
                     top: 0;
                 }
 
-                .button-container, .tracks-container, .recommended-artists, h2{
+                .button-container,
+                .tracks-container,
+                .recommended-artists,
+                h2 {
                     z-index: 10;
                     position: relative;
                 }
 
-                .track-image-details{
+                .track-image-details {
                     background-color: transparent;
                 }
 
-                .h2-title{
-                    color:white;
+                .h2-title {
+                    color: white;
                 }
 
-                .artist-home{
+                .artist-home {
                     background: rgba(222, 245, 229);
+                }
+
+                .track-image-details p {
+                    color: whitesmoke;
+                    z-index: 1;
+                    font-size: 1rem;
+                    text-shadow: -2px -2px 2px #000, 2px -2px 2px #000, -2px 2px 2px #000, 2px 2px 2px #000;
+                }
+
+                .track-image-details h2 {
+                    z-index: 1;
+                    font-size: 1.25rem;
+
+                }
+
+                .h2-title {
+                    margin: 0px 3vw 0px 3vw;
+                    text-shadow: -2px -2px 2px #000, 2px -2px 2px #000, -2px 2px 2px #000, 2px 2px 2px #000;
+                }
+
+                .btn-add-playlist-single {
+                    display: flex;
+                    justify-content: center;
+                    border: 3px solid white;
+                    border-radius: 90px;
+                    background: black;
+                    color: white;
+                    border-radius: 50%;
+                    align-items: center;
+                    padding: 10px;
+                    width: 12vw;
+                    height: 12vw;
+                    z-index: 1;
                 }
             </style>
 
             <!-- Ajoutez un lien vers la musique sur Spotify -->
             <div class="button-container" style="margin: 4vh; z-index: 10;">
-                <button class="spotify-button"><a href="<%= ArtistInfos.external_urls.spotify %>">Voir sur Spotify</a></button>
+                <button class="spotify-button"><a href="<%= ArtistInfos.external_urls.spotify %>">Voir sur
+                        Spotify</a></button>
             </div>
 
             <h2 class="h2-title">Musiques les plus écoutées</h2>
@@ -170,9 +216,11 @@
                         if (isSubscribed) {
                             // Si déjà abonné, effectuez la désinscription
                             unfollowArtist(artistId, this);
+                            afficherMessage("Désabonnement Réussi");
                         } else {
                             // Sinon, effectuez l'abonnement
                             followArtist(artistId, this);
+                            afficherMessage("Abonnement Réussi");
                         }
                     });
                 });
@@ -296,6 +344,45 @@
                 icon.textContent = isSubscribed ? 'remove_circle_outline' : 'library_add';
             }
         </script>
+
+        <div id="successMessage" class="animate__animated">Ajouté avec succès</div>
+
+        <script>
+        function afficherMessage(jesuislemsg) {
+            var message = document.getElementById('successMessage');
+
+            message.innerText = jesuislemsg;
+            
+            // Afficher le message
+            message.style.opacity = '1';
+
+            // Disparaître après 3 secondes
+            setTimeout(function() {
+                
+                message.style.opacity = '0';
+
+            }, 1000);
+        }
+
+        </script>
+        <style>
+        /* Style du message temporaire */
+        #successMessage {
+            position: fixed;
+            top: calc(7vh + 4vh);
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 10px;
+            background-color: #28a745;
+            color: #fff;
+            border-radius: 5px;
+            opacity: 0;
+            text-align: center;
+            width: 60vw;
+            transition: opacity 0.5s ease-in-out;
+            z-index: 3;
+        }
+        </style>
 </body>
 
 </html>

@@ -80,9 +80,9 @@ app.get('/auth/spotify/callback',
 );
 
 app.get('/error', async (req, res) => {
-        res.render('error-page', {  });
-    });
-    
+  res.render('error-page', {});
+});
+
 app.get('/logout', function (req, res, next) {
   if (req.isAuthenticated()) {
     req.logout(function (err) {
@@ -137,7 +137,8 @@ app.get('/top-tracks', async (req, res) => {
         res.render('topTracks', { recentTopTracks, MidTermTopTracks, longTermTopTracks, displayName, pp });
       } catch (error) {
         console.error('Erreur lors de la récupération des données Spotify:', error);
-        res.redirect('/error');      }
+        res.redirect('/error');
+      }
     }
 
     else {
@@ -207,7 +208,8 @@ app.get('/top-artists', async (req, res) => {
         res.render('topArtists', { recentTopArtists, MidTermTopArtists, longTermTopArtists, displayName, pp });
       } catch (error) {
         console.error('Erreur lors de la récupération des données Spotify:', error);
-        res.redirect('/error');      }
+        res.redirect('/error');
+      }
     }
 
     else {
@@ -245,7 +247,8 @@ app.get('/search', async (req, res) => {
         res.render('search', { displayName, pp, accessToken });
       } catch (error) {
         console.error('Erreur lors de la récupération des données Spotify:', error);
-        res.redirect('/error');      }
+        res.redirect('/error');
+      }
     }
 
     else {
@@ -424,7 +427,8 @@ app.get('/radar', async (req, res) => {
         res.render('radarManager', { albumsByArtist, displayName: user.displayName, endDate, startDate, pp });
       } catch (error) {
         console.error('Erreur lors de la récupération des données Spotify:', error);
-        res.redirect('/error');      }
+        res.redirect('/error');
+      }
     } else {
       console.error("Erreur: Access Token non disponible");
       res.redirect('/error');
@@ -575,7 +579,7 @@ app.get('/check-playlist', async (req, res) => {
     const lyricSPlaylistExists = await checkLyricSPlaylist(accessToken);
 
     // Répondez avec l'état d'existence de la playlist
-    res.json({ exists: lyricSPlaylistExists });
+    res.json({ exists: lyricSPlaylistExists.playlist });
   } catch (error) {
     console.error('Erreur lors de la vérification de l\'existence de la playlist "LyricS Playlist" :', error);
     res.status(500).json({ exists: false, error: 'Erreur lors de la vérification de l\'existence de la playlist "LyricS Playlist"' });
@@ -592,10 +596,16 @@ const checkLyricSPlaylist = async (accessToken) => {
     });
 
     const playlists = response.data.items;
-    console.log(playlists);
+    // console.log(playlists);
 
-    // Vérifiez si la playlist "LyricS Playlist" existe
-    return playlists.find(playlist => playlist.name === 'LyricS Playlist');
+    // Recherchez la playlist "LyricS Playlist"
+    const lyricSPlaylist = playlists.find(playlist => playlist.name === 'LyricS Playlist');
+
+    // Retournez un objet contenant la playlist et son ID (ou null si la playlist n'existe pas)
+    return {
+      playlist: lyricSPlaylist,
+      playlistId: lyricSPlaylist ? lyricSPlaylist.id : null,
+    };
   } catch (error) {
     console.error('Erreur lors de la création de la playlist "LyricS Playlist" :', error.response?.data || error.message);
     throw error;
@@ -717,7 +727,8 @@ app.get('/track/:id', async (req, res) => {
         } else {
           // Gérer d'autres types d'erreurs
           console.error('Erreur lors de la récupération des données Spotify:', error);
-          res.redirect('/error');        }
+          res.redirect('/error');
+        }
 
       }
     }
@@ -765,11 +776,14 @@ app.get('/home', async (req, res) => {
         const Home_infos_tracks_datas = Home_infos_tracks.data.items;
         const displayName = user.displayName;
         const pp = user_datas.data;
+        console.log(pp);
+        console.log(user);
 
         res.render('index', { Home_infos_artists_datas, Home_infos_tracks_datas, displayName, pp });
       } catch (error) {
         console.error('Erreur lors de la récupération des données Spotify:', error);
-        res.redirect('/error');      }
+        res.redirect('/error');
+      }
     }
 
     else {
@@ -846,7 +860,7 @@ app.get('/blindtest', async (req, res) => {
       const type = req.query.type;
       const id = req.query.id;
       const artistName = req.query.name;
-      
+
       try {
         const [user_datas] = await Promise.all([
           // axios.get('https://api.spotify.com/v1/me/playlists?limit=50', {
@@ -872,7 +886,7 @@ app.get('/blindtest', async (req, res) => {
         // Déclarez tracksData à l'extérieur de la boucle
         let tracksData;
         let allTrackNames = [];
-        
+
         if (type === 'playlist') {
           do {
             const tracksData = await axios.get(`https://api.spotify.com/v1/playlists/${id}/tracks`, {
@@ -1003,7 +1017,7 @@ app.get('/blindtest', async (req, res) => {
         // Obtenez l'ID de la playlist sélectionnée
         // const playlistId = '1L4rTXx7MNAuwvCzihm3ZH';
 
-        
+
 
         console.log(allTrackNames.length);
         console.log(allTrackNames);
@@ -1012,7 +1026,8 @@ app.get('/blindtest', async (req, res) => {
         res.render('blindtest', { tracks: allTracks, pp, displayName, accessToken, artistName });
       } catch (error) {
         console.error('Erreur lors de la récupération des données Spotify:', error);
-        res.redirect('/error');      }
+        res.redirect('/error');
+      }
     }
 
     else {
@@ -1059,7 +1074,8 @@ app.get('/blindtest-selector', async (req, res) => {
         res.render('blindtest-selector', { pp, displayName, accessToken });
       } catch (error) {
         console.error('Erreur lors de la récupération des données Spotify:', error);
-        res.redirect('/error');      }
+        res.redirect('/error');
+      }
     }
 
     else {
@@ -1074,6 +1090,193 @@ app.get('/blindtest-selector', async (req, res) => {
   }
 }
 );
+
+app.get('/lyrics-playlist', async (req, res) => {
+  if (req.isAuthenticated()) {
+    const user = req.user; // Accédez aux informations de l'utilisateur à partir de req.user
+    const accessToken = user.accessToken; // Exemple : Accédez à l'accessToken de l'utilisateur
+    if (req.user && req.user.accessToken) {
+      const lyricSPlaylistId = await checkLyricSPlaylist(accessToken);
+      const playlistId = lyricSPlaylistId.playlistId;
+
+      try {
+
+        const [user_datas] = await Promise.all([
+          // axios.get('https://api.spotify.com/v1/me/playlists?limit=50', {
+          //   headers: {
+          //     'Authorization': `Bearer ${req.user.accessToken}`
+          //   }
+          // }),
+
+          axios.get('https://api.spotify.com/v1/me', {
+            headers: {
+              'Authorization': `Bearer ${accessToken}`
+            }
+          })
+        ]);
+
+        // const playlists = playlistsData.data.items;
+        const displayName = user.displayName;
+        const pp = user_datas.data;
+
+        const playlistData = await getPlaylistData(accessToken, playlistId);
+        res.render('lyrics-playlist', { playlist: playlistData, displayName, pp, playlistId, accessToken });
+      } catch (error) {
+        console.error('Erreur lors de la récupération des données Spotify:', error);
+        res.redirect('/error');
+      }
+    }
+    else {
+      console.log("Access Token:", req.user.accessToken, "<br/><br/><br/><br/><br/><br/><br/><br/>"); // Ajout de cette ligne
+
+      console.error("Erreur: Access Token non disponible");
+      res.redirect('/error');
+    }
+  }
+  else {
+    res.redirect('/'); // Redirigez l'utilisateur vers l'authentification si ce n'est pas déjà fait
+  }
+}
+);
+
+app.post('/delete/:playlistId/:songId', async (req, res) => {
+  
+  try {
+    const accessToken = req.user.accessToken;
+    const trackId = req.params.songId;
+    console.log('track ID:', trackId);
+    const playlistId = req.params.playlistId;
+    console.log('Playlist ID:', playlistId);
+
+    await deleteSongFromPlaylist(accessToken, playlistId, trackId);
+    res.redirect('/lyrics-playlist');
+  } catch (error) {
+    // Gérer les erreurs de manière appropriée dans votre application
+    console.error("Erreur: Access Token non disponible", error);
+  }
+});
+
+// Fonction pour récupérer les informations de la playlist
+async function getPlaylistData(accessToken, playlistId) {
+  try {
+    const response = await axios.get(`https://api.spotify.com/v1/playlists/${playlistId}`, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    const playlistData = response.data;
+    const tracks = playlistData.tracks.items.map(item => {
+    const trackData = item.track;
+      return {
+        id: trackData.id,
+        name: trackData.name,
+        artists: trackData.artists,
+        cover: trackData.album.images[0].url,
+        external_url: trackData.external_urls.spotify,
+      };
+    });
+
+    return tracks;
+  } catch (error) {
+    console.error('Erreur lors de la récupération des informations de la playlist:', error.message);
+    throw error;
+  }
+}
+
+// Fonction pour supprimer une chanson de la playlist
+async function deleteSongFromPlaylist(accessToken, playlistId, trackId) {
+  console.log(accessToken, playlistId, trackId);
+  try {
+    const response = await axios({
+      method: 'delete',
+      url: `https://api.spotify.com/v1/playlists/${playlistId}/tracks`,
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+      },
+      data: {
+        tracks: [
+          {
+            uri: `spotify:track:${trackId}`,
+          },
+        ],
+      },
+    });
+
+    // La réponse pourrait être utilisée pour des vérifications supplémentaires si nécessaire
+    console.log('Statut de la réponse:', response.status);
+  } catch (error) {
+    console.error('Erreur lors de la suppression de la chanson de la playlist:', error.message);
+    throw error;
+  }
+}
+
+
+app.post('/clear-playlist/:playlistId', async (req, res) => {
+  try {
+      const accessToken = req.user.accessToken;
+      const playlistId = req.params.playlistId;
+
+      console.log('Playlist ID:', playlistId);
+
+      // Effectuer la suppression des pistes ici (utilisez la fonction clearPlaylist ou équivalente)
+      await clearPlaylist(accessToken, playlistId);
+
+      // Répondre avec un statut 204 (No Content) pour indiquer le succès
+      res.status(204).send();
+  } catch (error) {
+      // Gérer les erreurs de manière appropriée
+      console.error('Erreur lors de la suppression de toutes les chansons de la playlist:', error.message);
+      res.status(500).json({ error: 'Erreur serveur lors de la suppression des pistes' });
+  }
+});
+
+async function clearPlaylist(accessToken, playlistId) {
+  try {
+      // Récupérer les informations actuelles de la playlist
+      const responseInfo = await axios.get(`https://api.spotify.com/v1/playlists/${playlistId}`, {
+          headers: {
+              Authorization: `Bearer ${accessToken}`,
+          },
+      });
+
+      if (!responseInfo.data || !responseInfo.data.tracks || !responseInfo.data.tracks.items) {
+          throw new Error('Impossible de récupérer les informations de la playlist');
+      }
+
+      // Récupérer les IDs de toutes les pistes
+      const trackIds = responseInfo.data.tracks.items.map(item => item.track.id);
+      console.log(trackIds);
+      // Supprimer toutes les pistes de la playlist
+      const response = await axios({
+      method: 'delete',
+      url: `https://api.spotify.com/v1/playlists/${playlistId}/tracks`,
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+      },
+      data: {
+        tracks: trackIds.map(trackId => ({ uri: `spotify:track:${trackId}` })),
+      },
+    });
+
+    console.log('Réponse DELETE:', response.data);
+
+      if (!response.data) {
+          throw new Error('Impossible de supprimer les pistes de la playlist');
+      }
+
+      console.log('Playlist vidée avec succès');
+  } catch (error) {
+    if (error.response && error.response.data && error.response.data.error && error.response.data.error.message) {
+      console.error('Erreur lors de la suppression des pistes de la playlist:', error.response.data.error.message);
+    } else {
+      console.error('Erreur inattendue:', error.message);
+    }
+    throw error;
+  }
+}
 
 app.listen(3000, () => {
   console.log('Serveur en cours d\'exécution sur le port 3000');

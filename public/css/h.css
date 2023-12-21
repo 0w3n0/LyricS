@@ -346,13 +346,25 @@ h1 {
 }
 
 .button-container-timerange {
-  width: 80vw;
   display: flex;
-  justify-content: space-evenly;
+  justify-content: space-between;
+  align-items: center;
   margin: 1vh auto;
 }
 .button-container-timerange .btn-timerange-self {
-  background-color: lightgreen;
+  display: flex;
+  justify-content: center;
+  width: 25vw;
+  border: 3px solid white;
+  border-radius: 90px;
+  /* background: black; */
+  color: black;
+  font-weight: bold;
+  border-radius: 90px;
+  align-items: center;
+  padding: 10px;
+  margin: 0 auto 4vh auto;
+  font-size: 11px;
 }
 
 .form__group {
@@ -449,14 +461,20 @@ h1 {
 }
 
 .title-button-holder {
-  font-size: 12px;
+  font-size: 10px;
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
-  justify-content: space-around;
+  justify-content: space-between;
+  margin: 3vw;
+  align-items: center;
 }
 .title-button-holder button {
   font-size: 15px;
+  border: 3px solid black;
+  border-radius: 10px;
+  padding: 10px;
+  background: lightcoral;
 }
 
 .artist {
@@ -546,6 +564,7 @@ h1 {
 
 #t-i-d-radar {
   gap: 50px;
+  border-bottom: 3px solid black;
 }
 
 #TDetails {
@@ -848,4 +867,48 @@ input[type=checkbox] {
 }
 .spotify-button a {
   color: white;
+}
+
+.containerz {
+  height: 10vh;
+  padding: 20px;
+  text-align: center;
+  position: relative;
+}
+
+.content {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+.content p {
+  margin: 0 0 20px;
+}
+
+/* Arrow & Hover Animation */
+#more-arrows {
+  width: 75px;
+  height: 65px;
+}
+#more-arrows:hover polygon {
+  fill: #000;
+  transition: all 0.2s ease-out;
+}
+#more-arrows:hover polygon.arrow-bottom {
+  transform: translateY(-18px);
+}
+#more-arrows:hover polygon.arrow-top {
+  transform: translateY(18px);
+}
+
+polygon {
+  fill: #000;
+  transition: all 0.2s ease-out;
+}
+polygon.arrow-middle {
+  opacity: 0.75;
+}
+polygon.arrow-top {
+  opacity: 0.5;
 }/*# sourceMappingURL=h.css.map */

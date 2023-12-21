@@ -125,7 +125,9 @@
 
             <div class="tracks-container" style="min-height: 100vh;">
 
-                <h2 class="h2-title">Albums récents des artistes que vous suivez :</h2>
+                <div style="display: flex; justify-content: center;">
+                <h2 class="h2-title" id="recent">Sorties récentes</h2>
+                </div>
 
                 <div id="btn-switch-holder">
                     <div class="cbDiv">
@@ -147,7 +149,9 @@
                 <% const albumTypes={ 'album' : 'Albums' , 'single' : 'Singles' , 'compilation' : 'Compilations' , 'appears_on' : 'Apparitions' }; %>
                     
                 <div id="albumcontainer" class="album-container animate__animated animate__fadeIn">
-                    <h2 class="h2-title" id="h2-album">Albums</h2>
+                    <div style="display: flex; justify-content: center;">
+                        <h2 class="h2-title" id="h2-album">Albums</h2>
+                    </div>
                     <% albumsByArtist.forEach(artist => { %>
                         <% if (artist && artist.length > 0) { %>
                             <% const albumsOfType = artist.filter(album => album.album_type === 'album'); %>
@@ -168,7 +172,7 @@
                                                         display: flex;
                                                         justify-content: flex-end;
                                                         padding-left: 19px;
-                                                    ">playlist</i></span>
+                                                    ">playlist_add</i></span>
                                                     <span style="padding: 0px 0px 0px 10px;">Ajouter à la playlist</span>
                                                 </button>
                                                 <h2><%= album.name %></h2>
@@ -216,7 +220,9 @@
                 </div>
                 
                 <div id="singlecontainer" class="single-container animate__animated animate__fadeIn">         
-                    <h2 class="h2-title" id="h2-single">Singles</h2>             
+                    <div style="display: flex; justify-content: center;">
+                        <h2 class="h2-title" id="h2-single">Singles</h2>             
+                    </div>
                     <% albumsByArtist.forEach(artist => { %>
                         <% if (artist && artist.length > 0) { %>            
                             <% const singlesOfType = artist.filter(album => album.album_type === 'single'); %>               
@@ -267,7 +273,7 @@
                                                             display: flex;
                                                             justify-content: flex-end;
                                                             padding-left: 20px;
-                                                        ">playlist</i></span>   
+                                                        ">playlist_add</i></span>   
                                                     </button>                                                
                                                 </div>
                                             </div>
@@ -282,7 +288,9 @@
                 </div>
 
                 <div id="epcontainer" class="EP-container animate__animated animate__fadeIn">
-                    <h2 class="h2-title" id="h2-ep">EPs</h2>
+                    <div style="display: flex; justify-content: center;">
+                        <h2 class="h2-title" id="h2-ep">EPs</h2>
+                    </div>
                     <% albumsByArtist.forEach(artist => { %>
                         <% if (artist && artist.length > 0) { %>
                             <% const EpsOfType = artist.filter(album => album.album_type === 'single'); %>
@@ -306,7 +314,7 @@
                                                             display: flex;
                                                             justify-content: flex-end;
                                                             padding-left: 19px;
-                                                        ">playlist</i></span>
+                                                        ">playlist_add</i></span>
                                                         <span style="padding: 0px 0px 0px 10px;">Ajouter à la playlist</span>
                                                     </button>
 
@@ -411,6 +419,24 @@
                 height: 12vw;
                 margin: auto 10px;
             }
+
+            .h2-title{
+                font-size: 20px;
+                margin: 3vw 45px 3vw;
+                text-align: center;
+                background: beige;
+                border-radius: 25px;
+                padding: 10px;
+                text-transform: uppercase;
+                padding: 4vw;
+
+            }
+
+            #recent{
+                background: lavender;
+                font-size: 28px;
+            }
+
           </style>
 
         <script>
@@ -526,6 +552,7 @@
 
             async function addAlbumToPlaylist(album_Id) {
                 try {
+                    afficherMessage("Ajouté avec succès");
                     let playlistId = 0;
                 // Effectuez une requête vers la route côté serveur pour vérifier l'existence de la playlist
                     const response_check = await fetch(`/check-playlist`);
@@ -588,7 +615,44 @@
             }
         </script>
         
-        
+        <div id="successMessage" class="animate__animated">Ajouté avec succès</div>
+
+        <script>
+        function afficherMessage(jesuislemsg) {
+            var message = document.getElementById('successMessage');
+
+            message.innerText = jesuislemsg;
+            
+            // Afficher le message
+            message.style.opacity = '1';
+
+            // Disparaître après 3 secondes
+            setTimeout(function() {
+                
+                message.style.opacity = '0';
+
+            }, 1000);
+        }
+
+        </script>
+        <style>
+        /* Style du message temporaire */
+        #successMessage {
+            position: fixed;
+            top: calc(7vh + 4vh);
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 10px;
+            background-color: #28a745;
+            color: #fff;
+            border-radius: 5px;
+            opacity: 0;
+            text-align: center;
+            width: 60vw;
+            transition: opacity 0.5s ease-in-out;
+            z-index: 3;
+        }
+        </style>
 
         <!-- Compiled and minified JavaScript -->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>

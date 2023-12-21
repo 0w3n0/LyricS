@@ -16,7 +16,10 @@
     <%- include('header.ejs') %>
 
         <main class="following-main">
-            <h2 class="h2-title">Artistes suivis</h2>
+            <div style="width: 100vw; margin: 0px 3vw 0px 3vw; text-align: center; padding: 7rem 0; display: flex; flex-direction: column; align-items: center;">
+                <h2 class="h2-title" style="margin: 3vw 45px 3vw">Artistes suivis</h2>
+                <p style="width: 62vw">Gérer vos abonnements directement sur cette page !</p>
+            </div>
             <div class="artists-container-home">
                 <% artists.forEach(artist=> { %>
                     <div class="artist-home">
@@ -40,6 +43,12 @@
             </div>
         </main>
 
+        <style>
+            html{
+                background-color: #FAC898;
+            }
+
+        </style>
         <script>
             // Fonction pour se désabonner d'un artiste
             async function unfollowArtist(artistId) {
